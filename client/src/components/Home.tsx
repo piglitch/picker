@@ -8,6 +8,7 @@ function Home() {
   return (
     <div>
       <Navbar />
+      <div className='borderNav w-full'></div>
       {isHome && <HomePage />}
       <Outlet />
     </div>
