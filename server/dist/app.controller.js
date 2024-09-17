@@ -17,8 +17,7 @@ let AppController = class AppController {
         this.appService = appService;
     }
     outputString() {
-        const sentence = `${this.appService.getHello()}, ${this.appService.sayHi()}`;
-        return sentence;
+        return this.appService.sendJson();
     }
 };
 exports.AppController = AppController;
@@ -26,7 +25,7 @@ __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", String)
+    __metadata("design:returntype", Object)
 ], AppController.prototype, "outputString", null);
 exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),

@@ -5,6 +5,14 @@ import { RootState } from "../redux/store";
 function Dashboard() {
   const count = useSelector((state: RootState) => state.counter.value);
   const dispatch = useDispatch();
+
+  const fetchReq = async() => {  
+    const res = await fetch("http://localhost:3000/", { mode: 'cors' });
+    const data = await res.json();
+    console.log(data); 
+  }
+  fetchReq();
+
   return (
     <div className="content-format mt-64">
       Counter: {count}
