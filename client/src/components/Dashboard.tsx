@@ -2,7 +2,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { decrement, increment } from "../redux/slices/counterSlice";
 import { RootState } from "../redux/store";
 import { useState } from "react";
-import AddBoxIcon from '@mui/icons-material/AddBox';
+import AddIcon from '@mui/icons-material/Add';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Link } from "react-router-dom";
 
 
 function Dashboard() {
@@ -30,10 +32,13 @@ function Dashboard() {
       <div className="flex justify-between gap-x-10 cursor-pointer">
         <div>
           <h1>My apps</h1>
-          <Card className="mt-6 w-96 h-60">
+          <Card className="mt-6 w-96 h-60 bg-yellow-50 border-none">
             <CardHeader>
               <CardTitle>Example app</CardTitle>
-              <CardDescription>url goes here</CardDescription>
+              <div className="flex justify-between bg-slate-300 p-2 rounded-md">
+                <CardDescription><i>https://xyzabcd-12345.com</i></CardDescription>
+                <ContentCopyIcon fontSize="small" />
+              </div>
             </CardHeader>
             <CardContent>
               <p><strong className="text-xl">0.0%</strong> / 2 GB</p>
@@ -43,7 +48,9 @@ function Dashboard() {
             </CardFooter>
           </Card>
         </div>
-        <div title="Create a new app"><AddBoxIcon fontSize="large" className="cursor-pointer hover:scale-110"/></div>
+        <Link to="/dashboard/new-app">
+          <div title="Create a new app" className="bg-violet-500 bg-opacity-50 h-max p-2 rounded-md"><AddIcon className="cursor-pointer"/> Create a new app</div>
+        </Link>
       </div>
     </div>
   )

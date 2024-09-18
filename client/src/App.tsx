@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import Home from './components/Home';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import NewApp from './components/NewApp';
 
 function App() {
   const router = createBrowserRouter([ 
@@ -15,6 +16,10 @@ function App() {
           path: "/dashboard",
           element: <Dashboard />
         },
+        {
+          path: "/dashboard/new-app",
+          element: <NewApp />
+        }
       ]
     }
   ]);
