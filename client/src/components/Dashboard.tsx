@@ -17,8 +17,8 @@ import { dummyData } from '../../constants/dummy';
 import { v4 as uuidv4 } from 'uuid';
 
 function Dashboard() {
-  const [status, setStatus] = useState();
-  let appDetails = {};
+  // const [status, setStatus] = useState();
+  // let appDetails = {};
   //const count = useSelector((state: RootState) => state.counter.value);
   //const dispatch = useDispatch();
   // const fetchReq = async() => {  
@@ -42,32 +42,34 @@ function Dashboard() {
   }
   return (
     <div className="content-format mt-6">
-      <div className="flex justify-between gap-x-10 cursor-pointer">
+      <div className="flex justify-between gap-x-10">
         <div>
           <h1>My apps</h1>
+          <div className="flex mt-10 gap-6">
           {dummyData.userApps.map(
             app => (    
-            <Card key={uuidv4()} className="mt-6 w-96 h-60 bg-yellow-50 border-none">
+            <Card key={uuidv4()} className="mt-6 w-96 h-60 border-none bg-violet-700 cursor-pointer text-white" onClick={() => window.location.href = `/dashboard/app/${app.appId}`}>
               <CardHeader>
                 <CardTitle>{app.appName}</CardTitle>
-                <div className="flex justify-between bg-slate-300 p-2 text-black rounded-md">
-                  <CardDescription>App Url: {app.appUrl}</CardDescription>
+                <div onClick={(e) => e.stopPropagation()} className="flex justify-between bg-slate-300 p-2 text-black rounded-md cursor-text">
+                  <CardDescription>{app.appUrl}</CardDescription>
                 </div>
               </CardHeader>
-              <CardContent>
-                <p><strong className="text-xl">{app.storageUsed}</strong> / {app.storageLimit}
+              <CardContent onClick={(e) => e.stopPropagation()} className="cursor-text w-min">
+                <p><strong className="text-xl text-yellow-400">{app.storageUsed}</strong> / {app.storageLimit}
                   &nbsp;<span className="text-sm">({handleStorageUnits(app.storageUsed, app.storageLimit)})</span>
                 </p>
               </CardContent>
-              <CardFooter>
-                <p className="bg-green-700 bg-opacity-50 rounded-md p-1">{app.plan}</p>
+              <CardFooter onClick={(e) => e.stopPropagation()}>
+                <p className="bg-green-700 bg-opacity-80 rounded-md py-1 w-12 text-center cursor-text">{app.plan}</p>
               </CardFooter>
             </Card>
             )
           )}
+          </div>
         </div>
         <Link to="/dashboard/new-app">
-          <div title="Create a new app" className="bg-violet-500 bg-opacity-50 h-max p-2 rounded-md"><AddIcon className="cursor-pointer"/> Create a new app</div>
+          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md"><AddIcon className="cursor-pointer"/> Create a new app</div>
         </Link>
       </div>
     </div>
