@@ -79,7 +79,7 @@ export function ComboboxDemo() {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[250px] justify-between bg-white"
+          className="w-full justify-between bg-white"
         >
           {value
             ? regions.find((region) => region.value === value)?.label

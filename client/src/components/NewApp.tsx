@@ -16,10 +16,10 @@ const NewApp = () => {
           <CardTitle>Create a new app</CardTitle>
         </CardHeader>
         <CardContent>
-          <label htmlFor="">Name of the app</label><input type="text" className='bg-white outline-none border rounded-md border-slate-400 p-1 w-[250px]' />            
+          <label htmlFor="">Name of the app</label><input type="text" className='bg-white outline-none border rounded-md border-slate-400 p-1 w-full' />            
         </CardContent>
         <CardContent>
-          <label htmlFor="">Url of the app</label><input type="text" className='bg-white outline-none border rounded-md border-slate-400 p-1 w-[250px]' />            
+          <label htmlFor="">Url of the app</label><input type="text" className='bg-white outline-none border rounded-md border-slate-400 p-1 w-full' />            
         </CardContent>
         <CardContent>
           <label htmlFor="">Hosting region</label>
@@ -27,6 +27,7 @@ const NewApp = () => {
           <ComboboxDemo />         
         </CardContent>
         <CardFooter>
+          <button type="button" className="bg-green-500 p-1 rounded-md text-white">Submit</button>
         </CardFooter>
       </Card>
     </div>
