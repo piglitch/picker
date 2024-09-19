@@ -107,3 +107,7 @@ button:hover{
     @apply bg-background text-foreground;
   }
 }
+
+.card-title{
+  pointer-events: none;
+}

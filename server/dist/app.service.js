@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
+const dummyData_1 = require("./constants-server/dummyData");
 let AppService = class AppService {
     getHello() {
         return 'Hello World!';
@@ -16,10 +17,7 @@ let AppService = class AppService {
         return 'Hi pals';
     }
     sendJson() {
-        const resp = {
-            status: 'ok',
-        };
-        return resp;
+        return dummyData_1.dummyData;
     }
 };
 exports.AppService = AppService;

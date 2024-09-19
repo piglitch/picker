@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { dummyData } from './constants-server/dummyData';
 
 @Injectable()
 export class AppService {
@@ -9,9 +10,6 @@ export class AppService {
     return 'Hi pals';
   }
   sendJson(): object {
-    const resp = {
-      status: 'ok',
-    };
-    return resp;
+    return dummyData;
   }
 }

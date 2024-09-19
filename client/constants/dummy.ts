@@ -5,7 +5,7 @@ export const dummyData = {
       "appName": "My First CDN App",
       "plan": "Free",
       "region": "us-east-1",
-      "storageUsed": "500MB",
+      "storageUsed": "576MB",
       "storageLimit": "1GB",
       "appUrl": "https://xyz.com",
       "assets": [
