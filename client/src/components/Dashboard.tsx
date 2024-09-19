@@ -3,7 +3,6 @@ import { decrement, increment } from "../redux/slices/counterSlice";
 import { RootState } from "../redux/store";
 import { useEffect, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {
   Card,
   CardContent,
@@ -13,31 +12,38 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Link } from "react-router-dom";
-import { dummyData } from '../../constants/dummy';
 import { v4 as uuidv4 } from 'uuid';
 
+interface UserApp {
+  appId: string;
+  appName: string;
+  appUrl: string;
+  storageUsed: string;
+  storageLimit: string;
+  plan: string;
+}
+
+interface AppDetails {
+  userApps: UserApp[];
+}
+
 function Dashboard() {
-  // const [status, setStatus] = useState();
-  // let appDetails = {};
-  //const count = useSelector((state: RootState) => state.counter.value);
-  //const dispatch = useDispatch();
-  // const fetchReq = async() => {  
-  //   const res = await fetch("http://localhost:3000/api/images", { mode: 'cors' });
-  //   const data = await res.json();
-  //   setStatus(data.status)
-  //   console.log(data.status ? data.status : ''); 
-  // }
-  // fetchReq();
-  // useEffect(() => {
-  //   appDetails = {
-  //     name: dummyData.userApps[0].
-  //   }
-  // }, [])
+  const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
+  useEffect(() => {
+    const fetchReq = async() => {  
+      const res = await fetch("http://localhost:3000/api/user-apps/", { mode: 'cors' });
+      const data = await res.json();
+      setAppDetails(data);
+    }
+  
+    fetchReq();
+  }, []);
+
   const handleStorageUnits = (used: string, limit: string) => {
-    console.log('Before: ', used, limit);
+    // console.log('Before: ', used, limit);
     const USED = used.slice(used.length-2, used.length) === 'GB' ? Number(used.split('GB')[0])*1024 : Number(used.split('MB')[0])
     const LIMIT = limit.slice(limit.length-2, limit.length) === 'GB' ? Number(limit.split('GB')[0])*1024 : Number(limit.split('MB')[0])
-    console.log(USED, LIMIT);
+    // console.log(USED, LIMIT);
     return `${(USED/LIMIT).toFixed(2)}%`;
   }
   return (
@@ -46,7 +52,7 @@ function Dashboard() {
         <div>
           <h1>My apps</h1>
           <div className="flex mt-10 gap-6">
-          {dummyData.userApps.map(
+          {appDetails?.userApps.map(
             app => (    
             <Card key={uuidv4()} className="mt-6 w-96 h-60 border-none bg-violet-700 cursor-pointer text-white" onClick={() => window.location.href = `/dashboard/app/${app.appId}`}>
               <CardHeader>
