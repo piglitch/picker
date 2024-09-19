@@ -15,6 +15,12 @@ let AppService = class AppService {
     sayHi() {
         return 'Hi pals';
     }
+    sendJson() {
+        const resp = {
+            status: 'ok',
+        };
+        return resp;
+    }
 };
 exports.AppService = AppService;
 exports.AppService = AppService = __decorate([

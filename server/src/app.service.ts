@@ -8,4 +8,10 @@ export class AppService {
   sayHi(): string {
     return 'Hi pals';
   }
+  sendJson(): object {
+    const resp = {
+      status: 'ok',
+    };
+    return resp;
+  }
 }
