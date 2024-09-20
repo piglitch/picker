@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from "react-redux";
-import { decrement, increment } from "../redux/slices/counterSlice";
-import { RootState } from "../redux/store";
+// import { useDispatch, useSelector } from "react-redux";
+// import { decrement, increment } from "../redux/slices/counterSlice";
+// import { RootState } from "../redux/store";
 import { useEffect, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import {
@@ -13,30 +13,20 @@ import {
 } from "@/components/ui/card"
 import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { fetchReq } from '../../functions/fetchData';
+import { AppDetails } from '../../constants/types';
 
-interface UserApp {
-  appId: string;
-  appName: string;
-  appUrl: string;
-  storageUsed: string;
-  storageLimit: string;
-  plan: string;
-}
 
-interface AppDetails {
-  userApps: UserApp[];
-}
 
 function Dashboard() {
   const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
-  useEffect(() => {
-    const fetchReq = async() => {  
-      const res = await fetch("http://localhost:3000/api/user-apps/", { mode: 'cors' });
-      const data = await res.json();
+      const fetcher = async() => {  
+      const data = await fetchReq()
       setAppDetails(data);
     }
-  
-    fetchReq();
+
+  useEffect(() => {
+    fetcher();
   }, []);
 
   const handleStorageUnits = (used: string, limit: string) => {
