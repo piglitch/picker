@@ -18,7 +18,7 @@ const CdnApp = () => {
   const currApp = appDetails?.userApps.filter(app => app.appId === id)[0]
   return (
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
-      <div className='sidebar flex flex-col py-4 gap-2 w-1/6'>
+      <div className='sidebar flex flex-col py-4 gap-2 w-1/6 mt-8'>
         <div className='hover:bg-slate-300 p-1 w-48 rounded-md shadow-md'>Overview</div>
         <div className='hover:bg-slate-300 p-1 w-48 rounded-md shadow-md'>Files</div>
         <div className='hover:bg-slate-300 p-1 w-48 rounded-md shadow-md'>Settings</div>
