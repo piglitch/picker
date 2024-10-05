@@ -10,6 +10,7 @@ yarn-error.log*
 *.tmp
 *.sync
 *.log
+.env
 
 # IDE specific files
 /.vscode/

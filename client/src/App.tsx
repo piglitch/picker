@@ -5,7 +5,9 @@ import Home from './components/Home';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import NewApp from './components/NewApp';
-import CdnApp from './components/cdnApp';
+import CdnAppOverview from './components/cdnAppOverview';
+import CdnAppFiles from './components/cdnAppFiles';
+import CdnAppSettings from './components/cdnAppSettings';
 
 function App() {
   const router = createBrowserRouter([ 
@@ -22,8 +24,16 @@ function App() {
           element: <NewApp />
         },
         {
-          path: "/dashboard/app/:id",
-          element: <CdnApp />
+          path: "/dashboard/app/:id/overview",
+          element: <CdnAppOverview />
+        },
+        {
+          path: "/dashboard/app/:id/files",
+          element: <CdnAppFiles />
+        },
+        {
+          path: "/dashboard/app/:id/settings",
+          element: <CdnAppSettings />
         }
       ]
     }
