@@ -83,9 +83,7 @@
 body {
   margin: 0;
 }
-button{
-  transition: 0.3s ease-in-out;
-}
+
 button:hover{
   box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.5);
 }

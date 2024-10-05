@@ -13,9 +13,6 @@ let AppService = class AppService {
     getHello() {
         return 'Hello World!';
     }
-    sayHi() {
-        return 'Hi pals';
-    }
     sendJson() {
         return dummyData_1.dummyData;
     }

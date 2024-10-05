@@ -1,10 +1,12 @@
 // src/redux/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import counterReducer from './slices/counterSlice';
+import appIdSlice from './slices/setAppId';
 
 const store = configureStore({
   reducer: {
     counter: counterReducer, // Add reducers here
+    appId: appIdSlice
   },
 });
 

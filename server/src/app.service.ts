@@ -6,9 +6,6 @@ export class AppService {
   getHello(): string {
     return 'Hello World!';
   }
-  sayHi(): string {
-    return 'Hi pals';
-  }
   sendJson(): object {
     return dummyData;
   }
