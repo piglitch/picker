@@ -20,7 +20,7 @@ const CdnAppSettings = () => {
   return (
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
       <SideBar />
-      <div>Settings</div> 
+      <div className='content-format'>Settings</div> 
     </div>
   )
 }

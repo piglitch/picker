@@ -15,10 +15,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { fetchReq } from '../../functions/fetchData';
 import { AppDetails } from '../../constants/types';
 import { Link } from "react-router-dom";
+import { useClerk } from "@clerk/clerk-react";
 
 function Dashboard() {
   const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
-  
+  const { session, user } = useClerk()
+
   const fetcher = async() => {  
     const data = await fetchReq()
     setAppDetails(data);
@@ -28,6 +30,10 @@ function Dashboard() {
     fetcher();
   }, []);
 
+  if (!session || !user) {
+    return null;
+  }
+  console.log(user);
   const handleStorageUnits = (used: string, limit: string) => {
     // console.log('Before: ', used, limit);
     const USED = used.slice(used.length-2, used.length) === 'GB' ? Number(used.split('GB')[0])*1024 : Number(used.split('MB')[0])
@@ -43,8 +49,8 @@ function Dashboard() {
   return (
     <div className="content-format mt-6">
       <div className="flex justify-between gap-x-10">
-        <div>
-          <h1>My apps</h1>
+        <div><h1 className="text-violet-500">Welcome, {user.fullName}</h1>
+          <h1 className="pt-10">Your apps</h1>
           <div className="flex mt-10 gap-6">
           {appDetails?.userApps.map(
             app => (    

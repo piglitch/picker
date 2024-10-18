@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { s3UploadController } from './s3.controller';
+import { s3UploadController } from './s3Upload.controller';
 import { UploadService } from './s3.service';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { S3ListFilesController } from './s3ListFiles.controller';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
     ]),
     ConfigModule.forRoot(),
   ],
-  controllers: [AppController, s3UploadController],
+  controllers: [AppController, s3UploadController, S3ListFilesController],
   providers: [
     AppService,
     UploadService,

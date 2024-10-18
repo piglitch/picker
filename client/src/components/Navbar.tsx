@@ -1,3 +1,4 @@
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
@@ -11,7 +12,14 @@ const Navbar = () => {
       </div>
       <div className="my-auto flex justify-between gap-6">
         <div><Link to="/dashboard">Dashboard</Link></div>
-        <div>SignIn</div> 
+        <div>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </div> 
       </div>
     </nav>
   )
