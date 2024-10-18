@@ -1,6 +1,7 @@
 import Navbar from './Navbar';
 import { Outlet, useLocation } from 'react-router-dom';
 import HomePage from './HomePage';
+import { SignedIn } from '@clerk/clerk-react';
 
 function Home() {
   const loc = useLocation()
@@ -10,7 +11,7 @@ function Home() {
       <Navbar />
       <div className='borderNav w-full'></div>
       {isHome && <HomePage />}
-      <Outlet />
+      <SignedIn><Outlet /></SignedIn> 
     </div>
   )
 }
