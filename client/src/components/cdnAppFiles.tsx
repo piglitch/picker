@@ -2,7 +2,6 @@ import { AppDetails } from 'constants/types';
 import { fetchReq } from '../../functions/fetchData';
 import { useEffect, useState } from 'react'
 import SideBar from './ui/sideBar';
-import { ClipboardSignature } from 'lucide-react';
 
 const CdnAppFiles = () => {
   const [, setAppDetails] = useState<AppDetails | null>(null);
@@ -52,12 +51,17 @@ const CdnAppFiles = () => {
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
       <SideBar />
       <div className='content-format'>
-        <input type="file" onChange={handleFileChange} name="fileinput" accept='image/*' />
-        <button type="button" className='p-1 w-max rounded-md text-white bg-red-600'
-          onClick={handleUpload}
-        >
-          Upload
-        </button>
+        <div>
+          <input type="file" onChange={handleFileChange} name="fileinput" accept='image/*' />
+          <button type="button" className='p-1 w-max rounded-md text-white bg-red-600'
+            onClick={handleUpload}
+          >
+            Upload
+          </button>  
+        </div>
+        <div className='mt-6'>
+          <h3>My files</h3>
+        </div>
       </div>  
     </div>
   )
