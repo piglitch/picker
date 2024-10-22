@@ -49,7 +49,7 @@ function Dashboard() {
   return (
     <div className="content-format mt-6">
       <div className="flex justify-between gap-x-10">
-        <div><h1 className="text-violet-500">Welcome, {user.fullName}</h1>
+        <div><h1 className="text-violet-500">Welcome, {user.username}</h1>
           <h1 className="pt-10">Your apps</h1>
           <div className="flex mt-10 gap-6">
           {appDetails?.userApps.map(
