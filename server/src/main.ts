@@ -7,10 +7,9 @@ import crypto from "crypto";
 import { dummyData } from "../dummyData/dummy";
 import check from "../sendData/check";
 import dotenv from "dotenv";
-import { createUser } from "../db/queries";
+import { createUser, getAllUsers } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
 import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
-import { json } from "stream/consumers";
 // import { clerkClient, requireAuth } from '@clerk/express'
 
 dotenv.config()
@@ -30,27 +29,27 @@ const bucketRegion = process.env.BUCKET_REGION!;
 const accessKey = process.env.ACCESS_KEY!;
 const secretKey = process.env.SECRET_KEY!;
 
+let currentUser = null;
 // const clerk = new Clerk(process.env.CLERK_PUBLISHABLE_KEY!)
 // clerk.load()
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
-// const session = clerkClient.sessions.getSession()
-let users: string[]
-const getAllUsers = async() => {
-  
+
+let users: object[]
+const checkIfUserExists = async (currentUser: any) => {
   users = []
-  const userList = await clerkClient.users.getUserList()
-  for(let i = 0; i < userList.totalCount; i++){
-    users.push(userList.data[0].id)
+  const userList = await getAllUsers()
+  for(let i = 0; i < userList?.length!; i++){
+    users.push(userList![i])
   }
-  // console.log(users);
-  // if () {
-    
-  // }
+  console.log(users);
+  if(users.includes(currentUser.id)){
+    console.log('user exists!', users);
+  } else {
+    createUser(currentUser)
+  }
+  console.log(userList?.length);
 }
-
-console.log(getAllUsers());
-
 
 const s3 = new S3Client({
   credentials: {
@@ -63,14 +62,22 @@ const s3 = new S3Client({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.get("/", ClerkExpressRequireAuth(), async (req: RequireAuthProp<Request>, res) => {
-  // const { userId } = req.auth
-  const user = await clerkClient.users.getUser(req.auth.userId)
-  console.log(user.id === users[0]);
-  res.send(check());
+
+app.get("/", async (req: Request, res) => {
+  res.send("Server is up!")
 });
 
-app.get("/api/user-apps/", (req: Request, res: Response) => {
+app.get("/verify-user", ClerkExpressRequireAuth(), async (req: RequireAuthProp<Request>, res) => {
+  const user = await clerkClient.users.getUser(req.auth.userId);
+  checkIfUserExists(user);
+  console.log(user.id);
+  res.redirect("/api/user-apps");
+});
+
+app.get("/api/user-apps/", async (req:Request, res: Response) => {
+  // const user = await clerkClient.users.getUser(req.auth.userId)
+  // checkIfUserExists(user)
+  // console.log(user.id);
   res.send(dummyData);
 });
 
@@ -95,17 +102,17 @@ app.post("/api/s3-upload/", upload.single("file"), async (req: Request, res: Res
   }
 });
 
-app.post("/api/create-user/", (req: Request, res: Response) => {
-  try {
-    createUser()
-    res.status(200).send({ 'status': 'Data stored' })
-  } catch (error) {
-    console.log(error);
-  }
-})
+// app.post("/api/create-user/", (req: Request, res: Response) => {
+//   try {
+//     res.status(200).send({ 'status': 'Data stored' })
+//   } catch (error) {
+//     console.log(error);
+//   }
+// })
 
 app.get("/api/create-user/", (req: Request, res: Response) => {
-  res.send('route is up')
+  console.log(req.originalUrl);
+  res.json('route is up');
 })
 
 app.listen(3000, () => {
