@@ -13,7 +13,6 @@ const Navbar = () => {
       <div className="my-auto flex justify-between gap-6">
         <div><Link to="/dashboard">Dashboard</Link></div>
         <div>
-          {/* <button type="button" onClick={addUser}>Add user</button> */}
           <SignedOut>
             <SignInButton forceRedirectUrl={"/dashboard"} />
           </SignedOut>

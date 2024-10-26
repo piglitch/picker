@@ -28,16 +28,7 @@ export async function createUser(user: any) {
       data: {
         name: user.fullName,
         files: {
-          create: [
-            {
-              title: "My First File01",
-              key: "file_key_1_01",
-            },
-            {
-              title: "My Second File02",
-              key: "file_key_2_02",
-            },
-          ],
+          create: []
         },
         email: user.emailAddresses[0].emailAddress
       },
@@ -59,5 +50,25 @@ export async function getAllUsers(){
     console.error(err);
   } finally {
     await prisma.$disconnect();
+  }
+}
+
+export async function addFile(user:any, file:any){
+  const existingUser = await prisma.user.findUnique({
+    where: { email: user.email },
+  });
+  try {
+    const updatedUser = await prisma.file.create({
+      data: {
+        title: file.title,
+        uploaderId: existingUser?.id,
+        key: file.key,
+      }
+    })
+    console.log('File added! ', updatedUser);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    prisma.$disconnect();
   }
 }

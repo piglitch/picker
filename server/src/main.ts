@@ -7,7 +7,7 @@ import crypto from "crypto";
 import { dummyData } from "../dummyData/dummy";
 import check from "../sendData/check";
 import dotenv from "dotenv";
-import { createUser, getAllUsers } from "../db/queries";
+import { addFile, createUser, getAllUsers } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
 import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // import { clerkClient, requireAuth } from '@clerk/express'
@@ -29,15 +29,25 @@ const bucketRegion = process.env.BUCKET_REGION!;
 const accessKey = process.env.ACCESS_KEY!;
 const secretKey = process.env.SECRET_KEY!;
 
-let currentUser = null;
 // const clerk = new Clerk(process.env.CLERK_PUBLISHABLE_KEY!)
 // clerk.load()
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
 let users: object[]
+let updatedUser = {
+  id: null, 
+  name: null, 
+  email: null,
+};
+
 const checkIfUserExists = async (currentUser: any) => {
   users = []
+  updatedUser = { 
+    id: currentUser.id, 
+    name: currentUser.fullName, 
+    email: currentUser.emailAddresses[0].emailAddress
+  };
   const userList = await getAllUsers()
   for(let i = 0; i < userList?.length!; i++){
     users.push(userList![i])
@@ -85,7 +95,7 @@ app.get("/api/s3-upload", (req: Request, res: Response) => {
   res.send("upload route");
 });
 
-app.post("/api/s3-upload/", upload.single("file"), async (req: Request, res: Response) => {
+app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res: Response) => {
   try {
     const params = {
       Bucket: bucketName,
@@ -93,22 +103,21 @@ app.post("/api/s3-upload/", upload.single("file"), async (req: Request, res: Res
       Body: req.file?.buffer,
       ContentType: req.file?.mimetype,
     };
+    const userFile = {
+      id: params.Key,
+      title: req.file?.originalname,
+      uploaderId: req.params.id,
+      key: params.Key
+    }
     const command = new PutObjectCommand(params);
-    await s3.send(command);
+    //await s3.send(command);
+    addFile(updatedUser, userFile)
     console.log("File name: ", params.Key);
     res.status(200).send({ status: `${req.file?.originalname} is uploaded!` });
   } catch (err) {
     res.status(500).send({ status: err });
   }
 });
-
-// app.post("/api/create-user/", (req: Request, res: Response) => {
-//   try {
-//     res.status(200).send({ 'status': 'Data stored' })
-//   } catch (error) {
-//     console.log(error);
-//   }
-// })
 
 app.get("/api/create-user/", (req: Request, res: Response) => {
   console.log(req.originalUrl);

@@ -75,7 +75,13 @@ function Dashboard() {
           </div>
         </div>
         <Link to="/dashboard/new-app">
-          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md"><AddIcon className="cursor-pointer"/> Create a new app</div>
+          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md lg:block md:hidden">
+            <AddIcon className="cursor-pointer"/> 
+              Create a new app
+          </div>
+          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md lg:hidden">
+            <AddIcon className="cursor-pointer"/> 
+          </div>
         </Link>
       </div>
     </div>

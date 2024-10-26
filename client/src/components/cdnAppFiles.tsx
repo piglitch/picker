@@ -2,9 +2,12 @@ import { AppDetails } from 'constants/types';
 import { fetchReq } from '../../functions/fetchData';
 import { useEffect, useState } from 'react'
 import SideBar from './ui/sideBar';
+import { useClerk } from '@clerk/clerk-react';
 
 const CdnAppFiles = () => {
-  const [, setAppDetails] = useState<AppDetails | null>(null);
+  const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
+  const { session, user } = useClerk()
+  
   const fetcher = async() => {  
     const data = await fetchReq()
     setAppDetails(data);
@@ -19,6 +22,10 @@ const CdnAppFiles = () => {
     setFile(e.target.files[0]); // Save the selected single file
   };
 
+  if (!session || !user) {
+    return null;
+  }
+
   const handleUpload = async(e) => {
     console.log(file);
     e.preventDefault();
@@ -29,7 +36,7 @@ const CdnAppFiles = () => {
     const formData = new FormData();
     formData.append('file', file); 
     try {
-      const response = await fetch('http://localhost:3000/api/s3-upload/', {
+      const response = await fetch(`http://localhost:3000/api/${user.id}/s3-upload/`, {
         method: 'POST',
         body: formData,
       });
