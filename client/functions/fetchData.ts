@@ -4,15 +4,17 @@ const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 const clerk = new Clerk(clerkPubKey)
 clerk.load()
-export const fetchReq = async() => {  
-  const res = await fetch("http://localhost:3000/verify-user", 
+
+export const fetchReq = async(userId: string | undefined) => {  
+  const token = await clerk.session?.getToken();
+  const res = await fetch(`http://localhost:3000/${userId}/verify-user`, 
     { mode: 'cors', 
       headers: {
-        Authorization: `Bearer ${await clerk.session?.getToken()}`
-    } 
-  }
+        Authorization: `Bearer ${token}`,
+      } 
+    }
   );
   const data = await res.json();
-  console.log(data);
+  console.log('fetchData: ', data);
   return data;
 }

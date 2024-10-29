@@ -20,9 +20,9 @@ import { useClerk } from "@clerk/clerk-react";
 function Dashboard() {
   const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
   const { session, user } = useClerk()
-
+  
   const fetcher = async() => {  
-    const data = await fetchReq()
+    const data = await fetchReq(user?.id.toString())
     setAppDetails(data);
   }
 

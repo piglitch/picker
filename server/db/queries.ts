@@ -72,3 +72,18 @@ export async function addFile(user:any, file:any){
     prisma.$disconnect();
   }
 }
+
+export async function getAllFilesByUser(user: any){
+  try {
+    const currentUser = await prisma.user.findUnique({
+      where: { email: user.emailAddresses[0].emailAddress }
+    })
+    const filesByUser = await prisma.file.findMany({
+      where: { uploaderId: currentUser?.id }
+    })
+    return filesByUser;
+  } catch (error) {
+    console.error(error);
+    
+  }
+}

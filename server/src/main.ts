@@ -2,12 +2,12 @@ import express, { Request, Response } from "express";
 
 import cors from "cors"
 const multer = require("multer")
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from "crypto";
 import { dummyData } from "../dummyData/dummy";
 import check from "../sendData/check";
 import dotenv from "dotenv";
-import { addFile, createUser, getAllUsers } from "../db/queries";
+import { addFile, createUser, getAllFilesByUser, getAllUsers } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
 import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // import { clerkClient, requireAuth } from '@clerk/express'
@@ -15,11 +15,13 @@ import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk
 dotenv.config()
 
 const app = express();
+
 declare global {
   namespace Express {
     interface Request extends StrictAuthProp {}
   }
 }
+
 app.use(cors());
 app.use(express.json()); 
 const randomImageId = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
@@ -77,17 +79,20 @@ app.get("/", async (req: Request, res) => {
   res.send("Server is up!")
 });
 
-app.get("/verify-user", ClerkExpressRequireAuth(), async (req: RequireAuthProp<Request>, res) => {
-  const user = await clerkClient.users.getUser(req.auth.userId);
+// To verify the current user
+app.get("/:id/verify-user", async (req: Request, res) => {
+  const userId = req.params.id;
+  const user = await clerkClient.users.getUser(userId);
+  console.log(userId);
   checkIfUserExists(user);
-  console.log(user.id);
-  res.redirect("/api/user-apps");
+  res.redirect(`/api/${userId}/user-apps`);
 });
 
-app.get("/api/user-apps/", async (req:Request, res: Response) => {
-  // const user = await clerkClient.users.getUser(req.auth.userId)
-  // checkIfUserExists(user)
-  // console.log(user.id);
+app.get("/api/:id/user-apps/", async (req:Request, res: Response) => {
+  const userId = req.params.id;
+  const user = await clerkClient.users.getUser(userId);
+  checkIfUserExists(user);
+  console.log(user.id);
   res.send(dummyData);
 });
 
@@ -95,6 +100,14 @@ app.get("/api/s3-upload", (req: Request, res: Response) => {
   res.send("upload route");
 });
 
+app.get("/api/:id/all-files", async (req, res) => {
+  const userId = req.params.id;
+  const user = await clerkClient.users.getUser(userId);
+  const files = await getAllFilesByUser(user)
+  res.send(files)
+})
+
+// Uplaoding files to s3 
 app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res: Response) => {
   try {
     const params = {
@@ -109,8 +122,8 @@ app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res:
       uploaderId: req.params.id,
       key: params.Key
     }
-    const command = new PutObjectCommand(params);
-    //await s3.send(command);
+    const putObjCommand = new PutObjectCommand(params);
+    await s3.send(putObjCommand);
     addFile(updatedUser, userFile)
     console.log("File name: ", params.Key);
     res.status(200).send({ status: `${req.file?.originalname} is uploaded!` });
@@ -119,9 +132,44 @@ app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res:
   }
 });
 
-app.get("/api/create-user/", (req: Request, res: Response) => {
-  console.log(req.originalUrl);
-  res.json('route is up');
+
+
+async function getFileDetails(bucketName: string, key: string) {
+  try {
+    // Set the parameters for the command
+    const params = {
+      Bucket: bucketName,
+      Key: key,
+    };
+
+    // Execute the headObject command
+    const command = new HeadObjectCommand(params);
+    const data = await s3.send(command);
+
+    // Print out the file details
+    //console.log("File Details:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching file details:", error);
+  }
+}
+
+app.get("/api/:id/file-details", async (req, res) => {
+  const userId = req.params.id;
+  const user = await clerkClient.users.getUser(userId);
+  const files = await getAllFilesByUser(user)
+  const allFilesDetails = await Promise.all(
+    (files || []).map(file => getFileDetails(bucketName, file.key))
+  );
+  const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
+  let sum = 0
+  resFilesDetails.forEach(num => { 
+   if (num) {
+    sum += num
+   }
+  })
+  console.log(sum);
+  res.send({appSize: sum})
 })
 
 app.listen(3000, () => {

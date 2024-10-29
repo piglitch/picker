@@ -21,6 +21,13 @@ const HomePage = () => {
         </div> 
       </Vortex>
       <GridBackgroundDemo />
+      <footer className='text-slate-100  font-thin text-sm'>
+        &#169; &nbsp;	
+        <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
+          <u>piglitch</u> 
+        </a>
+        , 2024
+      </footer>
     </div>
   )
 }

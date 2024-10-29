@@ -1,25 +1,29 @@
-import { AppDetails } from 'constants/types';
-import { fetchReq } from '../../functions/fetchData';
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
 
+
 const CdnAppFiles = () => {
-  const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
-  const { session, user } = useClerk()
+  const [fileList, setFileList] = useState([]);
+  const [file, setFile] = useState<File | null>(null);
+  const { session, user } = useClerk();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const fetcher = async() => {  
-    const data = await fetchReq()
-    setAppDetails(data);
+    const data = await fetchFilesS3()
+    setFileList(data)
   }
+
   useEffect(() => {
     fetcher();
+    if (fileList.length<1) {
+      console.log('Loading');
+    }
   }, []);
-
-  const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]); // Save the selected single file
+    console.log(e.target.files);
   };
 
   if (!session || !user) {
@@ -27,7 +31,6 @@ const CdnAppFiles = () => {
   }
 
   const handleUpload = async(e) => {
-    console.log(file);
     e.preventDefault();
     if (!file) {
       console.log('no file selected');
@@ -43,33 +46,78 @@ const CdnAppFiles = () => {
       if (!response.ok) {
         const errorText = await response.text(); // Read the response as text
         throw new Error(`Server error: ${response.status} - ${errorText}`);
-    }
+      }
 
       const result = await response.json();
       console.log('File uploaded', result);
     } catch (error) {
       console.log('Error uploading: ', error);
     }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; 
+    }
     console.log('uploaded');
   }
 
+  async function fetchFilesS3() {
+    try {
+      const response = await fetch(`http://localhost:3000/api/${user?.id}/all-files/`);
+      const data = await response.json()
+     return data
+    } catch (err) {
+      console.error(err);
+    }
+  }
   //const currApp = appDetails?.userApps.filter(app => app.appId === id)[0]
   return (
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
       <SideBar />
-      <div className='content-format'>
-        <div>
-          <input type="file" onChange={handleFileChange} name="fileinput" accept='image/*' />
-          <button type="button" className='p-1 w-max rounded-md text-white bg-red-600'
-            onClick={handleUpload}
-          >
-            Upload
-          </button>  
+      { 
+        fileList.length > 1 ?
+          <div className='content-format'>
+            <div>
+              <input type="file" onChange={handleFileChange} ref={fileInputRef} name="fileinput" accept='image/*' />
+              <button type="button" className='p-1 w-max rounded-md text-white bg-red-600'
+                onClick={handleUpload}
+              >
+                Upload
+              </button>  
+            </div>
+            <div className='mt-6'>
+              <h3>My files</h3>
+                {
+                  fileList?.map((file, index) => 
+                  <div className='flex' key={index}>
+                    <img width={180} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
+                    <div className='bg-slate-400 h-max rounded p-1 italic text-xs'>Url: {`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`}</div>
+                  </div>)
+                }
+            </div>
+          </div>  : <div className="content-format animate-pulse">
+          <div className="flex space-x-4 items-center">
+            {/* File input skeleton */}
+            <div className="h-8 w-32 bg-slate-300 rounded"></div>
+            
+            {/* Upload button skeleton */}
+            <div className="h-8 w-20 bg-red-300 rounded-md"></div>
+          </div>
+
+          <div className="mt-6">
+            <div className="h-6 bg-slate-300 w-24 rounded mb-4"></div> {/* 'My files' title skeleton */}
+
+            {/* File list skeleton */}
+            {[...Array(3)].map((_, index) => (
+              <div className="flex space-x-4 mb-4" key={index}>
+                {/* Image thumbnail skeleton */}
+                <div className="w-44 h-24 bg-slate-300 rounded"></div>
+                
+                {/* URL placeholder skeleton */}
+                <div className="bg-slate-300 h-6 w-64 rounded"></div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className='mt-6'>
-          <h3>My files</h3>
-        </div>
-      </div>  
+      }
     </div>
   )
 }
