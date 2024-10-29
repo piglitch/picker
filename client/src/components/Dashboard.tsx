@@ -20,9 +20,9 @@ import { useClerk } from "@clerk/clerk-react";
 function Dashboard() {
   const [appDetails, setAppDetails] = useState<AppDetails | null>(null);
   const { session, user } = useClerk()
-
+  
   const fetcher = async() => {  
-    const data = await fetchReq()
+    const data = await fetchReq(user?.id.toString())
     setAppDetails(data);
   }
 
@@ -49,7 +49,7 @@ function Dashboard() {
   return (
     <div className="content-format mt-6">
       <div className="flex justify-between gap-x-10">
-        <div><h1 className="text-violet-500">Welcome, {user.fullName}</h1>
+        <div><h1 className="text-violet-500">Welcome, {user.username}</h1>
           <h1 className="pt-10">Your apps</h1>
           <div className="flex mt-10 gap-6">
           {appDetails?.userApps.map(
@@ -75,7 +75,13 @@ function Dashboard() {
           </div>
         </div>
         <Link to="/dashboard/new-app">
-          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md"><AddIcon className="cursor-pointer"/> Create a new app</div>
+          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md lg:block md:hidden">
+            <AddIcon className="cursor-pointer"/> 
+              Create a new app
+          </div>
+          <div title="Create a new app" className="bg-pink-600 h-max p-2 rounded-md lg:hidden">
+            <AddIcon className="cursor-pointer"/> 
+          </div>
         </Link>
       </div>
     </div>

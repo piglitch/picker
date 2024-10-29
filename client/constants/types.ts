@@ -10,3 +10,8 @@ export interface UserApp {
 export interface AppDetails {
   userApps: UserApp[];
 }
+
+export interface cdnFile {
+  id: number,
+  
+}

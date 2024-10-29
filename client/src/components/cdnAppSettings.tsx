@@ -3,13 +3,15 @@ import { fetchReq } from '../../functions/fetchData';
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import SideBar from './ui/sideBar';
+import { useClerk } from '@clerk/clerk-react';
 
 const CdnAppSettings = () => {
   const [, setAppDetails] = useState<AppDetails | null>(null);
   const {id} = useParams();
+  const { user } = useClerk();
   console.log(id);
   const fetcher = async() => {  
-    const data = await fetchReq()
+    const data = await fetchReq(user?.id)
     setAppDetails(data);
   }
   useEffect(() => {

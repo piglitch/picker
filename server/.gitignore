@@ -1,33 +1,3 @@
-# Node.js specific
-node_modules/
-npm-debug.log*
-yarn-error.log*
-.npmrc
-
-# Editor config files
-*.swp
-*.DS_Store
-*.tmp
-*.sync
-*.log
+node_modules
+# Keep environment variables out of version control
 .env
-
-# IDE specific files
-/.vscode/
-*.suo
-*.user
-*.sln
-*.csproj
-*.vbproj
-
-# TypeScript specific
-*.tscache
-
-# Testing
-coverage/
-
-# Build artifacts
-dist/
-
-# Git specific
-.git/

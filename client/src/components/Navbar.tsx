@@ -14,7 +14,7 @@ const Navbar = () => {
         <div><Link to="/dashboard">Dashboard</Link></div>
         <div>
           <SignedOut>
-            <SignInButton />
+            <SignInButton forceRedirectUrl={"/dashboard"} />
           </SignedOut>
           <SignedIn>
             <UserButton />
