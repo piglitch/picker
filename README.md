@@ -1,5 +1,5 @@
 
-# CDN App
+# Picker
 
 A content delivery network (CDN) application that enables users to securely upload, store, and retrieve image files. Built with Node.js, Express, AWS S3, PostgreSQL, Clerk for authentication, and Prisma as the ORM.
 
