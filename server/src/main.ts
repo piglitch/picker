@@ -11,6 +11,8 @@ import { addFile, createUser, getAllFilesByUser, getAllUsers } from "../db/queri
 import { createClerkClient } from "@clerk/backend";
 import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // import { clerkClient, requireAuth } from '@clerk/express'
+import redis, { createClient } from "redis";
+
 
 dotenv.config()
 
@@ -33,6 +35,9 @@ const secretKey = process.env.SECRET_KEY!;
 
 // const clerk = new Clerk(process.env.CLERK_PUBLISHABLE_KEY!)
 // clerk.load()
+
+const redisClient = createClient();
+redisClient.connect();
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
@@ -82,17 +87,21 @@ app.get("/", async (req: Request, res) => {
 // To verify the current user
 app.get("/:id/verify-user", async (req: Request, res) => {
   const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  console.log(userId);
-  checkIfUserExists(user);
+  const userString = await redisClient.get(`user:${userId}`)
+  if (!userString) {
+    const user = await clerkClient.users.getUser(userId);
+    // console.log(userId); 
+    await redisClient.set(`user:${userId}`, JSON.stringify(user))
+    checkIfUserExists(user)
+  } else{
+    checkIfUserExists(JSON.parse(userString!));
+  }
+  console.log(JSON.parse(userString!).id); 
+  
   res.redirect(`/api/${userId}/user-apps`);
 });
 
 app.get("/api/:id/user-apps/", async (req:Request, res: Response) => {
-  const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  checkIfUserExists(user);
-  console.log(user.id);
   res.send(dummyData);
 });
 
@@ -101,9 +110,12 @@ app.get("/api/s3-upload", (req: Request, res: Response) => {
 });
 
 app.get("/api/:id/all-files", async (req, res) => {
+
   const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  const files = await getAllFilesByUser(user)
+  // const user = await clerkClient.users.getUser(userId);
+  const userString = await redisClient.get(`user:${userId}`)
+  const files = await getAllFilesByUser(JSON.parse(userString!))
+  console.log(JSON.parse(userString!));
   res.send(files)
 })
 
@@ -156,18 +168,26 @@ async function getFileDetails(bucketName: string, key: string) {
 
 app.get("/api/:id/file-details", async (req, res) => {
   const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  const files = await getAllFilesByUser(user)
-  const allFilesDetails = await Promise.all(
-    (files || []).map(file => getFileDetails(bucketName, file.key))
-  );
-  const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
-  let sum = 0
-  resFilesDetails.forEach(num => { 
-   if (num) {
-    sum += num
-   }
-  })
+  const userString = await redisClient.get(`user:${userId}`)
+  const usage = await redisClient.get(`userFiles:${userId}`)
+  
+  // const user = await clerkClient.users.getUser(userId);
+  let sum = 0;
+  if (usage) {
+    sum = JSON.parse(usage);
+  } else {
+    const files = await getAllFilesByUser(JSON.parse(userString!))
+    const allFilesDetails = await Promise.all(
+      (files || []).map(file => getFileDetails(bucketName, file.key))
+    );
+    const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
+    resFilesDetails.forEach(num => { 
+     if (num) {
+      sum += num
+     }
+    })
+    await redisClient.set(`userFiles:${userId}`, JSON.stringify(sum))
+  }
   console.log(sum);
   res.send({appSize: sum})
 })

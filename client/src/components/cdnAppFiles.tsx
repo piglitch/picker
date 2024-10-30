@@ -63,6 +63,7 @@ const CdnAppFiles = () => {
     try {
       const response = await fetch(`http://localhost:3000/api/${user?.id}/all-files/`);
       const data = await response.json()
+      console.log(data);
      return data
     } catch (err) {
       console.error(err);
@@ -73,7 +74,7 @@ const CdnAppFiles = () => {
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
       <SideBar />
       { 
-        fileList.length > 1 ?
+        fileList ?
           <div className='content-format'>
             <div>
               <input type="file" onChange={handleFileChange} ref={fileInputRef} name="fileinput" accept='image/*' />
