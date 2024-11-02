@@ -43,7 +43,7 @@ function Dashboard() {
   }
 
   const handleRoute = (id: string) => {
-    window.location.href = `/dashboard/app/${id}/overview`
+    window.location.href = `/dashboard/user/${id}/overview`
   }
 
   return (
@@ -54,7 +54,7 @@ function Dashboard() {
           <div className="flex mt-10 gap-6">
           {appDetails?.userApps.map(
             app => (    
-            <Card key={uuidv4()} className="mt-6 w-96 h-60 border-none bg-violet-700 cursor-pointer text-white" onClick={() => handleRoute(app.appId)}>
+            <Card key={uuidv4()} className="mt-6 w-96 h-60 border-none bg-violet-700 cursor-pointer text-white" onClick={() => handleRoute(user.id)}>
               <CardHeader>
                 <CardTitle>{app.appName}</CardTitle>
                 <div onClick={(e) => e.stopPropagation()} className="flex justify-between bg-slate-300 p-2 text-black rounded-md cursor-text">

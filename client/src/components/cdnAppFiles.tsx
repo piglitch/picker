@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
-
+import fetchFileSizesS3 from '../../functions/fetchFilesSize';
 
 const CdnAppFiles = () => {
   const [fileList, setFileList] = useState([]);
   const [file, setFile] = useState<File | null>(null);
+  const [canUpload, setCanUpload] = useState(true);
   const { session, user } = useClerk();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const fetcher = async() => {  
     const data = await fetchFilesS3()
     setFileList(data)
+    const appSizeInBytes =  await fetchFileSizesS3(user?.id)
+    const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
+    setCanUpload(appSizeInMB(appSizeInBytes) < 500)
+    console.log(appSizeInMB(appSizeInBytes));
   }
 
   useEffect(() => {
@@ -39,7 +44,7 @@ const CdnAppFiles = () => {
     const formData = new FormData();
     formData.append('file', file); 
     try {
-      const response = await fetch(`http://localhost:3000/api/${user.id}/s3-upload/`, {
+      const response = await fetch(`http://localhost:3000/api/${user?.id}/s3-upload/`, {
         method: 'POST',
         body: formData,
       });
@@ -57,6 +62,7 @@ const CdnAppFiles = () => {
       fileInputRef.current.value = ""; 
     }
     console.log('uploaded');
+    window.location.reload();
   }
 
   async function fetchFilesS3() {
@@ -80,6 +86,7 @@ const CdnAppFiles = () => {
               <input type="file" onChange={handleFileChange} ref={fileInputRef} name="fileinput" accept='image/*' />
               <button type="button" className='p-1 w-max rounded-md text-white bg-red-600'
                 onClick={handleUpload}
+                disabled = { !canUpload }
               >
                 Upload
               </button>  
@@ -88,8 +95,8 @@ const CdnAppFiles = () => {
               <h3>My files</h3>
                 {
                   fileList?.map((file, index) => 
-                  <div className='flex' key={index}>
-                    <img width={180} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
+                  <div className='flex gap-1 mb-2' key={index}>
+                    <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
                     <div className='bg-slate-400 h-max rounded p-1 italic text-xs'>Url: {`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`}</div>
                   </div>)
                 }
