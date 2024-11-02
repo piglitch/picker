@@ -1,13 +1,14 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Route, RouterProvider } from 'react-router-dom';
 import './App.css'
-import Dashboard from './components/Dashboard';
+// import Dashboard from './components/Dashboard';
 import Home from './components/Home';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import NewApp from './components/NewApp';
+// import NewApp from './components/NewApp';
 import CdnAppOverview from './components/cdnAppOverview';
 import CdnAppFiles from './components/cdnAppFiles';
 import CdnAppSettings from './components/cdnAppSettings';
+import NotFound from './components/ErrorFile';
 
 function App() {
   const router = createBrowserRouter([ 
@@ -15,27 +16,31 @@ function App() {
       path: "/",
       element: <Home />,
       children: [
+        // {
+        //   path: "/dashboard",
+        //   element: <Dashboard />
+        // },
+        // {
+        //   path: "/dashboard/new-app",
+        //   element: <NewApp />
+        // },
         {
-          path: "/dashboard",
-          element: <Dashboard />
-        },
-        {
-          path: "/dashboard/new-app",
-          element: <NewApp />
-        },
-        {
-          path: "/dashboard/app/:id/overview",
+          path: "/user/:id/overview",
           element: <CdnAppOverview />
         },
         {
-          path: "/dashboard/app/:id/files",
+          path: "/user/:id/files",
           element: <CdnAppFiles />
         },
         {
-          path: "/dashboard/app/:id/settings",
+          path: "/user/:id/settings",
           element: <CdnAppSettings />
         }
-      ]
+      ],
+    }, 
+    {
+      path: "*",
+      element: <NotFound />
     }
   ]);
   return (

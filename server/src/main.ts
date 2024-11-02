@@ -5,12 +5,14 @@ const multer = require("multer")
 import { HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from "crypto";
 import { dummyData } from "../dummyData/dummy";
-import check from "../sendData/check";
+// import check from "../sendData/check";
 import dotenv from "dotenv";
 import { addFile, createUser, getAllFilesByUser, getAllUsers } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
 import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // import { clerkClient, requireAuth } from '@clerk/express'
+import redis, { createClient } from "redis";
+
 
 dotenv.config()
 
@@ -34,6 +36,9 @@ const secretKey = process.env.SECRET_KEY!;
 // const clerk = new Clerk(process.env.CLERK_PUBLISHABLE_KEY!)
 // clerk.load()
 
+const redisClient = createClient();
+redisClient.connect();
+
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
 let users: object[]
@@ -54,13 +59,11 @@ const checkIfUserExists = async (currentUser: any) => {
   for(let i = 0; i < userList?.length!; i++){
     users.push(userList![i])
   }
-  console.log(users);
   if(users.includes(currentUser.id)){
     console.log('user exists!', users);
   } else {
     createUser(currentUser)
   }
-  console.log(userList?.length);
 }
 
 const s3 = new S3Client({
@@ -82,17 +85,20 @@ app.get("/", async (req: Request, res) => {
 // To verify the current user
 app.get("/:id/verify-user", async (req: Request, res) => {
   const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  console.log(userId);
-  checkIfUserExists(user);
+  const userString = await redisClient.get(`user:${userId}`)
+  if (!userString) {
+    const user = await clerkClient.users.getUser(userId);
+    // console.log(userId); 
+    await redisClient.set(`user:${userId}`, JSON.stringify(user))
+    checkIfUserExists(user)
+  } else{
+    checkIfUserExists(JSON.parse(userString!));
+  }
+  //console.log(JSON.parse(userString!).id);  
   res.redirect(`/api/${userId}/user-apps`);
 });
 
 app.get("/api/:id/user-apps/", async (req:Request, res: Response) => {
-  const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  checkIfUserExists(user);
-  console.log(user.id);
   res.send(dummyData);
 });
 
@@ -102,14 +108,18 @@ app.get("/api/s3-upload", (req: Request, res: Response) => {
 
 app.get("/api/:id/all-files", async (req, res) => {
   const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  const files = await getAllFilesByUser(user)
+  // const user = await clerkClient.users.getUser(userId);
+  const userString = await redisClient.get(`user:${userId}`)
+  const files = await getAllFilesByUser(JSON.parse(userString!))
   res.send(files)
 })
 
 // Uplaoding files to s3 
 app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res: Response) => {
   try {
+    const userId = req.params.id;
+    const userString = await redisClient.get(`user:${userId}`)
+    const user = await JSON.parse(userString!)
     const params = {
       Bucket: bucketName,
       Key: randomImageId(),
@@ -123,9 +133,10 @@ app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res:
       key: params.Key
     }
     const putObjCommand = new PutObjectCommand(params);
+    console.log(user?.emailAddresses[0].emailAddress);
+    addFile(user?.emailAddresses[0].emailAddress, userFile)
     await s3.send(putObjCommand);
-    addFile(updatedUser, userFile)
-    console.log("File name: ", params.Key);
+    // console.log("File name: ", params.Key);
     res.status(200).send({ status: `${req.file?.originalname} is uploaded!` });
   } catch (err) {
     res.status(500).send({ status: err });
@@ -156,19 +167,26 @@ async function getFileDetails(bucketName: string, key: string) {
 
 app.get("/api/:id/file-details", async (req, res) => {
   const userId = req.params.id;
-  const user = await clerkClient.users.getUser(userId);
-  const files = await getAllFilesByUser(user)
-  const allFilesDetails = await Promise.all(
-    (files || []).map(file => getFileDetails(bucketName, file.key))
-  );
-  const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
-  let sum = 0
-  resFilesDetails.forEach(num => { 
-   if (num) {
-    sum += num
-   }
-  })
-  console.log(sum);
+  const userString = await redisClient.get(`user:${userId}`)
+  const usage = await redisClient.get(`userFiles:${userId}`)
+  
+  // const user = await clerkClient.users.getUser(userId);
+  let sum = 0;
+  if (usage) {
+    sum = JSON.parse(usage);
+  } else {
+    const files = await getAllFilesByUser(JSON.parse(userString!))
+    const allFilesDetails = await Promise.all(
+      (files || []).map(file => getFileDetails(bucketName, file.key))
+    );
+    const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
+    resFilesDetails.forEach(num => { 
+     if (num) {
+      sum += num
+     }
+    })
+    await redisClient.set(`userFiles:${userId}`, JSON.stringify(sum))
+  }
   res.send({appSize: sum})
 })
 

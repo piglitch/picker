@@ -53,9 +53,9 @@ export async function getAllUsers(){
   }
 }
 
-export async function addFile(user:any, file:any){
+export async function addFile(emailAddress:string, file:any){
   const existingUser = await prisma.user.findUnique({
-    where: { email: user.email },
+    where: { email: emailAddress },
   });
   try {
     const updatedUser = await prisma.file.create({
