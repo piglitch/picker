@@ -7,7 +7,7 @@ clerk.load()
 
 export const fetchReq = async(userId: string | undefined) => {  
   const token = await clerk.session?.getToken();
-  const res = await fetch(`http://localhost:3000/${userId}/verify-user`, 
+  const res = await fetch(`http://13.60.182.170:3000/${userId}/verify-user`, 
     { mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,

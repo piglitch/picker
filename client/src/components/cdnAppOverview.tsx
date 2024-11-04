@@ -22,7 +22,7 @@ const CdnAppOverView = () => {
   const fetcher = async() => {  
     await fetchReq(user?.id.toString())
     // setAppDetails(user.id);
-    const data = await fetch(`http://localhost:3000/api/${user?.id}/user-apps/`);
+    const data = await fetch(`http://13.60.182.170:3000/api/${user?.id}/user-apps/`);
     const jsonData = await data.json();
     const appSizeInBytes =  await fetchFileSizesS3(user?.id)
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
@@ -35,7 +35,7 @@ const CdnAppOverView = () => {
  
   // async function fetchFilesS3() {
   //   try {
-  //     const response = await fetch(`http://localhost:3000/api/${user?.id}/file-details`);
+  //     const response = await fetch(`http://13.60.182.170:3000/api/${user?.id}/file-details`);
   //     const data = await response.json()
   //     const appSizeInBytes = data.appSize;
   //     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
