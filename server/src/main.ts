@@ -191,5 +191,5 @@ app.get("/api/:id/file-details", async (req, res) => {
 })
 
 app.listen(3000, () => {
-  console.log(`Server running at http://localhost:3000`);
+  console.log(`Server running at http://13.60.182.170:3000`);
 });
