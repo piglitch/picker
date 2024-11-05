@@ -1,7 +1,8 @@
 import { GridBackgroundDemo } from './ui/grid';
 import { Vortex } from './ui/vortex';
-
+const hostName = import.meta.env.REACT_APP_API_URL!
 const HomePage = () => {
+  console.log(hostName);
   return (
     <div className='my-auto mx-auto rounded-md h-max overflow-hidden'>
       <Vortex

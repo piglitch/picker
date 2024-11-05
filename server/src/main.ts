@@ -25,9 +25,7 @@ declare global {
   }
 }
 
-app.use(cors({
-  origin: 'https://pickerclient.vercel.app' // replace with your Vercel app URL
-}));
+app.use(cors());
 app.use(express.json()); 
 const randomImageId = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
 
@@ -114,6 +112,7 @@ app.get("/api/:id/all-files", async (req, res) => {
   // const user = await clerkClient.users.getUser(userId);
   const userString = await redisClient.get(`user:${userId}`)
   const files = await getAllFilesByUser(JSON.parse(userString!))
+  console.log(files);
   res.send(files)
 })
 

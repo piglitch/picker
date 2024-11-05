@@ -1,13 +1,14 @@
 import { Clerk } from '@clerk/clerk-js'
 
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY!
+const hostName = import.meta.env.VITE_REACT_APP_API_URL!
+console.log(hostName);
 const clerk = new Clerk(clerkPubKey)
 clerk.load()
 
 export const fetchReq = async(userId: string | undefined) => {  
   const token = await clerk.session?.getToken();
-  const res = await fetch(`https://13.60.182.170/${userId}/verify-user`, 
+  const res = await fetch(`http://${hostName}/${userId}/verify-user`, 
     { mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,

@@ -8,6 +8,7 @@ import { useClerk } from '@clerk/clerk-react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { fetchReq } from '../../functions/fetchData';
 import fetchFileSizesS3 from '../../functions/fetchFilesSize';
+const hostName = import.meta.env.VITE_REACT_APP_API_URL!
 
 // import { useDispatch, useSelector } from 'react-redux';
 
@@ -22,7 +23,7 @@ const CdnAppOverView = () => {
   const fetcher = async() => {  
     await fetchReq(user?.id.toString())
     // setAppDetails(user.id);
-    const data = await fetch(`https://13.60.182.170/api/${user?.id}/user-apps/`);
+    const data = await fetch(`http://${hostName}/api/${user?.id}/user-apps/`);
     const jsonData = await data.json();
     const appSizeInBytes =  await fetchFileSizesS3(user?.id)
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
