@@ -14,6 +14,7 @@ import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk
 import redis, { createClient } from "redis";
 
 
+
 dotenv.config()
 
 const app = express();
@@ -24,7 +25,9 @@ declare global {
   }
 }
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://pickerclient.vercel.app' // replace with your Vercel app URL
+}));
 app.use(express.json()); 
 const randomImageId = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
 
