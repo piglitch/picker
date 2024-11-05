@@ -79,8 +79,8 @@ const CdnAppFiles = () => {
   return (
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
       <SideBar />
-      { 
-        fileList ?
+      {/* { 
+        fileList ? */}
           <div className='content-format'>
             <div>
               <input type="file" onChange={handleFileChange} ref={fileInputRef} name="fileinput" accept='image/*' />
@@ -101,33 +101,37 @@ const CdnAppFiles = () => {
                   </div>)
                 }
             </div>
-          </div>  : <div className="content-format animate-pulse">
-          <div className="flex space-x-4 items-center">
-            {/* File input skeleton */}
-            <div className="h-8 w-32 bg-slate-300 rounded"></div>
-            
-            {/* Upload button skeleton */}
-            <div className="h-8 w-20 bg-red-300 rounded-md"></div>
-          </div>
-
-          <div className="mt-6">
-            <div className="h-6 bg-slate-300 w-24 rounded mb-4"></div> {/* 'My files' title skeleton */}
-
-            {/* File list skeleton */}
-            {[...Array(3)].map((_, index) => (
-              <div className="flex space-x-4 mb-4" key={index}>
-                {/* Image thumbnail skeleton */}
-                <div className="w-44 h-24 bg-slate-300 rounded"></div>
-                
-                {/* URL placeholder skeleton */}
-                <div className="bg-slate-300 h-6 w-64 rounded"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      }
+          </div>  
+          
+          
     </div>
   )
 }
 
 export default CdnAppFiles
+
+// : <div className="content-format animate-pulse">
+//           <div className="flex space-x-4 items-center">
+//             {/* File input skeleton */}
+//             <div className="h-8 w-32 bg-slate-300 rounded"></div>
+            
+//             {/* Upload button skeleton */}
+//             <div className="h-8 w-20 bg-red-300 rounded-md"></div>
+//           </div>
+
+//           <div className="mt-6">
+//             <div className="h-6 bg-slate-300 w-24 rounded mb-4"></div> {/* 'My files' title skeleton */}
+
+//             {/* File list skeleton */}
+//             {[...Array(3)].map((_, index) => (
+//               <div className="flex space-x-4 mb-4" key={index}>
+//                 {/* Image thumbnail skeleton */}
+//                 <div className="w-44 h-24 bg-slate-300 rounded"></div>
+                
+//                 {/* URL placeholder skeleton */}
+//                 <div className="bg-slate-300 h-6 w-64 rounded"></div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       }
