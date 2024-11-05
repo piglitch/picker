@@ -44,7 +44,7 @@ const CdnAppFiles = () => {
     const formData = new FormData();
     formData.append('file', file); 
     try {
-      const response = await fetch(`http://13.60.182.170:3000/api/${user?.id}/s3-upload/`, {
+      const response = await fetch(`https://13.60.182.170/api/${user?.id}/s3-upload/`, {
         method: 'POST',
         body: formData,
       });
@@ -67,7 +67,7 @@ const CdnAppFiles = () => {
 
   async function fetchFilesS3() {
     try {
-      const response = await fetch(`http://13.60.182.170:3000/api/${user?.id}/all-files/`);
+      const response = await fetch(`https://13.60.182.170/api/${user?.id}/all-files/`);
       const data = await response.json()
       console.log(data);
      return data
