@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
 import fetchFileSizesS3 from '../../functions/fetchFilesSize';
+const hostName = import.meta.env.VITE_REACT_APP_API_URL!
 
 const CdnAppFiles = () => {
   const [fileList, setFileList] = useState([]);
@@ -44,7 +45,7 @@ const CdnAppFiles = () => {
     const formData = new FormData();
     formData.append('file', file); 
     try {
-      const response = await fetch(`https://13.60.182.170/api/${user?.id}/s3-upload/`, {
+      const response = await fetch(`http://${hostName}/api/${user?.id}/s3-upload/`, {
         method: 'POST',
         body: formData,
       });
@@ -62,15 +63,15 @@ const CdnAppFiles = () => {
       fileInputRef.current.value = ""; 
     }
     console.log('uploaded');
-    window.location.reload();
+    //window.location.reload();
   }
 
   async function fetchFilesS3() {
     try {
-      const response = await fetch(`https://13.60.182.170/api/${user?.id}/all-files/`);
+      const response = await fetch(`http://${hostName}/api/${user?.id}/all-files/`);
       const data = await response.json()
-      console.log(data);
-     return data
+      console.log('rsssss', response);
+      return data
     } catch (err) {
       console.error(err);
     }

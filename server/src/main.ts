@@ -14,6 +14,7 @@ import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk
 import redis, { createClient } from "redis";
 
 
+
 dotenv.config()
 
 const app = express();
@@ -78,7 +79,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 
-app.get("/", async (req: Request, res) => {
+app.get("/api/", async (req: Request, res) => {
   res.send("Server is up!")
 });
 
@@ -111,6 +112,7 @@ app.get("/api/:id/all-files", async (req, res) => {
   // const user = await clerkClient.users.getUser(userId);
   const userString = await redisClient.get(`user:${userId}`)
   const files = await getAllFilesByUser(JSON.parse(userString!))
+  console.log(files);
   res.send(files)
 })
 
