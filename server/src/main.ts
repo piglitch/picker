@@ -79,7 +79,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 
-app.get("/", async (req: Request, res) => {
+app.get("/api/", async (req: Request, res) => {
   res.send("Server is up!")
 });
 
