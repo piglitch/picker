@@ -6,7 +6,7 @@ import { createClerkClient } from '@clerk/backend'
 
 dotenv.config();
 
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_PUBLISHABLE_KEY })
 const connectionString = `${process.env.DATABASE_URL}`
 
 const pool = new Pool({ connectionString })
@@ -26,7 +26,7 @@ export async function createUser(user: any) {
     }
     const newUser = await prisma.user.create({
       data: {
-        name: user.fullName,
+        name: `${user.firstName} ${user.lastName}`,
         files: {
           create: []
         },
@@ -60,9 +60,9 @@ export async function addFile(emailAddress:string, file:any){
   try {
     const updatedUser = await prisma.file.create({
       data: {
-        title: file.title,
-        uploaderId: existingUser?.id,
-        key: file.key,
+        title: file.title!,
+        uploaderId: existingUser?.id!,
+        key: file.key!,
       }
     })
     console.log('File added! ', updatedUser);
@@ -86,4 +86,20 @@ export async function getAllFilesByUser(user: any){
     console.error(error);
     
   }
+}
+
+export async function test_connection(){
+ try{
+    const file = await prisma.file.create({
+      data: {
+        title: 'admin test',
+        uploaderId: 101,
+        key: 'abcdadmincheck',
+      }
+    })
+  }  catch (err) {
+    console.error(err);
+  } finally {
+    prisma.$disconnect();
+  }  
 }

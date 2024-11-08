@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
-import fetchFileSizesS3 from '../../functions/fetchFilesSize';
-const hostName = import.meta.env.VITE_REACT_APP_API_URL!
+import { fetchFileSizesS3, fetchFilesS3, uploadFile } from '../../functions/fetchData';
+
+// const hostName = import.meta.env.VITE_REACT_APP_API_URL!
+
+
 
 const CdnAppFiles = () => {
   const [fileList, setFileList] = useState([]);
@@ -10,9 +13,10 @@ const CdnAppFiles = () => {
   const [canUpload, setCanUpload] = useState(true);
   const { session, user } = useClerk();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
   const fetcher = async() => {  
-    const data = await fetchFilesS3()
+    // const token = await clerk.session?.getToken();
+    const data = await fetchFilesS3(user?.id)
+    console.log(data);
     setFileList(data)
     const appSizeInBytes =  await fetchFileSizesS3(user?.id)
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
@@ -45,10 +49,7 @@ const CdnAppFiles = () => {
     const formData = new FormData();
     formData.append('file', file); 
     try {
-      const response = await fetch(`http://${hostName}/api/${user?.id}/s3-upload/`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await uploadFile(user.id, formData)
       if (!response.ok) {
         const errorText = await response.text(); // Read the response as text
         throw new Error(`Server error: ${response.status} - ${errorText}`);
@@ -66,17 +67,6 @@ const CdnAppFiles = () => {
     //window.location.reload();
   }
 
-  async function fetchFilesS3() {
-    try {
-      const response = await fetch(`http://${hostName}/api/${user?.id}/all-files/`);
-      const data = await response.json()
-      console.log('rsssss', response);
-      return data
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  //const currApp = appDetails?.userApps.filter(app => app.appId === id)[0]
   return (
     <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
       <SideBar />
