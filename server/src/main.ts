@@ -2,12 +2,12 @@ import express, { Request, Response } from "express";
 
 import cors from "cors"
 const multer = require("multer")
-import { HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from "crypto";
-import { dummyData } from "../dummyData/dummy";
+// import { dummyData } from "../dummyData/dummy";
 // import check from "../sendData/check";
 import dotenv from "dotenv";
-import { addFile, createUser, getAllFilesByUser, getAllUsers, test_connection } from "../db/queries";
+import { addFile, createUser, deleteFileObj, getAllFilesByUser, getAllUsers, test_connection } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
 // import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // const { expressWithAuth, requireAuth } = require('@clerk/clerk-sdk-node');
@@ -32,7 +32,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json()); 
-const randomImageId = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
+const randomImageId = (bytes = 8) => crypto.randomBytes(bytes).toString("hex");
 
 const bucketName = process.env.BUCKET_NAME!;
 const bucketRegion = process.env.BUCKET_REGION!;
@@ -176,6 +176,29 @@ app.post("/api/:id/s3-upload/", upload.single("file"), requireAuth(), async (req
 });
 
 
+app.delete("/api/:id/delete-object/:fileKey", requireAuth(), async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userString = await redisClient.get(`user:${userId}`)
+    const user = JSON.parse(userString!);
+    const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
+
+    if (!emailAddress) {
+      res.status(400).send({ status: 'User email not found' });
+      return; // Return after sending the response
+    }
+
+  const fileKey = req.params.fileKey;
+    const bucketParams = { Bucket: bucketName, Key: fileKey };
+    const deleteFile = new DeleteObjectCommand(bucketParams);
+    await s3.send(deleteFile);
+    await deleteFileObj(emailAddress, fileKey)
+    res.status(200).send({ status: 'file is deleted' });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).send({ status: error instanceof Error ? error.message : 'Unknown error' });
+  }
+} )
 
 
 async function getFileDetails(bucketName: string, key: string) {
@@ -234,6 +257,7 @@ app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
 
-app.listen(3000, () => {
-  console.log(`Server running at http://13.60.182.170:3000`);
+const port = 3000
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });

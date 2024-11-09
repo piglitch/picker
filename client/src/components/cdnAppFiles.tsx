@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
-import { fetchFileSizesS3, fetchFilesS3, uploadFile } from '../../functions/fetchData';
+import { deleteFile, fetchFileSizesS3, fetchFilesS3, uploadFile } from '../../functions/fetchData';
 
 // const hostName = import.meta.env.VITE_REACT_APP_API_URL!
 
@@ -26,9 +26,6 @@ const CdnAppFiles = () => {
 
   useEffect(() => {
     fetcher();
-    if (fileList.length<1) {
-      console.log('Loading');
-    }
   }, []);
 
   const handleFileChange = (e) => {
@@ -64,7 +61,7 @@ const CdnAppFiles = () => {
       fileInputRef.current.value = ""; 
     }
     console.log('uploaded');
-    //window.location.reload();
+    window.location.reload();
   }
 
   return (
@@ -84,17 +81,20 @@ const CdnAppFiles = () => {
             </div>
             <div className='mt-6'>
               <h3>My files</h3>
+                <div className='flex text-center bg-slate-300 rounded-sm w-max'>
+                  <div className='border-r-2 p-1 w-24'>Preview</div>
+                  <div className='border-r-2 p-1 '>Url</div>
+                </div>
                 {
                   fileList?.map((file, index) => 
                   <div className='flex gap-1 mb-2' key={index}>
                     <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
                     <div className='bg-slate-400 h-max rounded p-1 italic text-xs'>Url: {`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`}</div>
+                    <button type="button" onClick={() => deleteFile(user.id, file.key)}>Delete</button>
                   </div>)
                 }
             </div>
           </div>  
-          
-          
     </div>
   )
 }

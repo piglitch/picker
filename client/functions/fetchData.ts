@@ -78,6 +78,24 @@ export async function fetchFileSizesS3(userId: string | undefined) {
   }
 }
 
+export async function deleteFile(userId: string | undefined, fileKey: string) {
+  try {
+    console.log(userId, fileKey);
+    const token = await clerk.session?.getToken();
+    const deleteFile = await fetch(`http://${hostName}/api/${userId}/delete-object/${fileKey}/`,
+      { 
+        method: "DELETE",
+        mode: 'cors', 
+        headers: {
+          Authorization: `Bearer ${token}`,
+        } 
+      }
+    );
+    console.log('file deleted: ', deleteFile);
+  } catch (err) {
+    console.error(err);
+  }
+}
 
 export async function test(){
   const token = await clerk.session?.getToken();

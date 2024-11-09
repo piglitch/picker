@@ -19,6 +19,6 @@ model File {
   id         Int    @id @default(autoincrement())
   title      String
   uploaderId Int
-  key        String
+  key        String @unique
   uploader   User   @relation(fields: [uploaderId], references: [id])
 }

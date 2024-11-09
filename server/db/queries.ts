@@ -73,6 +73,21 @@ export async function addFile(emailAddress:string, file:any){
   }
 }
 
+export async function deleteFileObj(emailAddress:string, fileId:string){
+  try {
+    const deleteFile = await prisma.file.delete({
+      where: {
+        key: fileId!,
+      },
+    })
+    console.log('File removed: ', deleteFile);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    prisma.$disconnect();
+  }
+}
+
 export async function getAllFilesByUser(user: any){
   try {
     const currentUser = await prisma.user.findUnique({
