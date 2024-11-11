@@ -87,7 +87,7 @@ const CdnAppFiles = () => {
         ref={fileInputRef} 
         name="fileinput" 
         accept='image/*'
-        className='border border-gray-300 rounded-md p-2 text-sm bg-white'
+        className='border border-gray-300 rounded-md p-2 text-sm text-black bg-white'
       />
       <button 
         type="button" 
@@ -99,14 +99,14 @@ const CdnAppFiles = () => {
       </button>  
     </div>
     <div className='space-y-4'>
-      <h3 className='text-lg font-semibold text-gray-700'>My Files</h3>
+      <h3 className='text-lg font-semibold'>My Files</h3>
       <div className='space-y-3'>
         {fileList?.map((file, index) => (
           <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
-          <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} alt="" />
-          <div className='flex-1 text-gray-600 font-medium'>{file.title}</div>
+          <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
+          <div className='flex-1 font-medium'>{file.title}</div>
             <DropdownMenu>
-              <DropdownMenuTrigger className='p-2 rounded-full hover:bg-gray-200'>
+              <DropdownMenuTrigger className='p-2 rounded-full hover:bg-black'>
                 <MoreVertIcon />
               </DropdownMenuTrigger>
               <DropdownMenuContent className='bg-white border rounded-md shadow-lg'>
