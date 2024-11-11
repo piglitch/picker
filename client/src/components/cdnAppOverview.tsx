@@ -29,27 +29,31 @@ const CdnAppOverView = () => {
   }, []);
  
   return (
-    <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
+    <div className='content-format flex h-96 md:h-[720px] mt-6'>
       <SideBar />
       {
         appsize >= 0 ?
         <div className='w-5/6 px-6'>
-          <div className='bg-slate-100 mt-4 rounded-md shadow-md h-[500px] w-lg'>
+          <div className='mt-4 rounded-md h-[500px] w-lg'>
             <Gauge 
               className='mx-auto' 
                 height={250} 
                 sx={(theme) => ({
                 [`& .${gaugeClasses.valueArc}`]: {
-                  fill: '#FFA500',
+                  fill: '#ADFF2F',
                 },
                 [`& .${gaugeClasses.referenceArc}`]: {
                   fill: theme.palette.text.disabled,
                 },
+                [`& .${gaugeClasses.valueText}`]: {
+                  fontSize: 0,
+                },
+                
               })} 
               value={appsize*100/500} valueMin={0} valueMax={100} 
             />
             <div className='flex justify-center'>
-              {appsize}MB / 1024MB
+              {appsize}MB / 1024MB ({(appsize*100/1024).toFixed(2)} %)
             </div>
           </div>
         </div>        

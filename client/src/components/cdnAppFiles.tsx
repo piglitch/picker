@@ -77,7 +77,7 @@ const CdnAppFiles = () => {
   }
 
   return (
-<div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-lg bg-gray-100 shadow-md text-gray-800'>
+<div className='content-format h-96 md:h-[720px] mt-6 flex'>
   <SideBar />
   <div className='flex-1 p-6 space-y-6'>
     <div className='flex flex-col md:flex-row items-start md:items-center gap-4'>

@@ -1,5 +1,3 @@
-import React from 'react'
-
 function OverViewLoading() {
   return (
     <div className="w-5/6 px-6 animate-pulse">

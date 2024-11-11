@@ -33,7 +33,6 @@ function Dashboard() {
   if (!session || !user) {
     return null;
   }
-  console.log(user);
   const handleStorageUnits = (used: string, limit: string) => {
     // console.log('Before: ', used, limit);
     const USED = used.slice(used.length-2, used.length) === 'GB' ? Number(used.split('GB')[0])*1024 : Number(used.split('MB')[0])
