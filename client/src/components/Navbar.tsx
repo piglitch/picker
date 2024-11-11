@@ -1,5 +1,4 @@
 import { SignedIn, SignedOut, SignInButton, useClerk, UserButton } from "@clerk/clerk-react";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
@@ -17,7 +16,7 @@ const Navbar = () => {
           <SignInButton />
         </SignedOut>
         <SignedIn>
-          <div><Link to={`/user/${user?.id}/files`}>Dashboard</Link></div>
+          <div><Link to={`/user/${user?.id}/files/`}>Dashboard</Link></div>
           <UserButton />
         </SignedIn>
       </div>

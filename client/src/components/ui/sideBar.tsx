@@ -11,7 +11,7 @@ const SideBar = () => {
       setDot(prevDot => !prevDot); // Toggle dot state
     }, 500);
     return () => clearInterval(interval); // Cleanup on unmount
-  }, [location.pathname]);
+  }, []);
   return (
     <div className='sidebar flex flex-col py-4 gap-2 w-1/6 mt-8'> 
       <Link to={`/user/${params.id}/files/`}>
