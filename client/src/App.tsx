@@ -25,7 +25,7 @@ function App() {
         //   element: <NewApp />
         // },
         {
-          path: "/user/:id/overview",
+          path: "/user/:id/usage",
           element: <CdnAppOverview />
         },
         {

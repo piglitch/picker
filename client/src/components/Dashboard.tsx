@@ -42,7 +42,7 @@ function Dashboard() {
   }
 
   const handleRoute = (id: string) => {
-    window.location.href = `/dashboard/user/${id}/overview`
+    window.location.href = `/dashboard/user/${id}/usage`
   }
 
   return (

@@ -1,5 +1,3 @@
-import SideBar from "./sideBar";
-
 export function GridBackgroundDemo() {
   return (
     <div className="h-[50rem] w-full bg-black bg-grid-white/[0.2] relative flex items-center justify-center">
