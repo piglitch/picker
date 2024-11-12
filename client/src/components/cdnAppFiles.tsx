@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
-import fetchFileSizesS3 from '../../functions/fetchFilesSize';
-const hostName = import.meta.env.VITE_REACT_APP_API_URL!
+import { deleteFile, fetchFileSizesS3, fetchFilesS3, uploadFile } from '../../functions/fetchData';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+// const hostName = import.meta.env.VITE_REACT_APP_API_URL!
+
+
 
 const CdnAppFiles = () => {
   const [fileList, setFileList] = useState([]);
@@ -10,9 +20,13 @@ const CdnAppFiles = () => {
   const [canUpload, setCanUpload] = useState(true);
   const { session, user } = useClerk();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
   const fetcher = async() => {  
-    const data = await fetchFilesS3()
+    // const token = await clerk.session?.getToken();
+    let data = await fetchFilesS3(user?.id)
+	if(!data){
+	data = [];		
+	}
+    console.log(data);
     setFileList(data)
     const appSizeInBytes =  await fetchFileSizesS3(user?.id)
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
@@ -22,10 +36,12 @@ const CdnAppFiles = () => {
 
   useEffect(() => {
     fetcher();
-    if (fileList.length<1) {
-      console.log('Loading');
-    }
-  }, []);
+  }, [fileList.length]);
+
+  const handleFileDeletion = async(userId: string, fileKey: string) => {
+    await deleteFile(userId, fileKey)
+    await fetcher()
+  }
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]); // Save the selected single file
@@ -45,10 +61,7 @@ const CdnAppFiles = () => {
     const formData = new FormData();
     formData.append('file', file); 
     try {
-      const response = await fetch(`http://${hostName}/api/${user?.id}/s3-upload/`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await uploadFile(user.id, formData)
       if (!response.ok) {
         const errorText = await response.text(); // Read the response as text
         throw new Error(`Server error: ${response.status} - ${errorText}`);
@@ -63,49 +76,65 @@ const CdnAppFiles = () => {
       fileInputRef.current.value = ""; 
     }
     console.log('uploaded');
-    //window.location.reload();
+    await fetcher();
   }
 
-  async function fetchFilesS3() {
-    try {
-      const response = await fetch(`http://${hostName}/api/${user?.id}/all-files/`);
-      const data = await response.json()
-      console.log('rsssss', response);
-      return data
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  //const currApp = appDetails?.userApps.filter(app => app.appId === id)[0]
   return (
-    <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
-      <SideBar />
-      {/* { 
-        fileList ? */}
-          <div className='content-format'>
-            <div>
-              <input type="file" onChange={handleFileChange} ref={fileInputRef} name="fileinput" accept='image/*' />
-              <button type="button" className='p-1 w-max rounded-md text-white bg-red-600'
-                onClick={handleUpload}
-                disabled = { !canUpload }
-              >
-                Upload
-              </button>  
-            </div>
-            <div className='mt-6'>
-              <h3>My files</h3>
-                {
-                  fileList?.map((file, index) => 
-                  <div className='flex gap-1 mb-2' key={index}>
-                    <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
-                    <div className='bg-slate-400 h-max rounded p-1 italic text-xs'>Url: {`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`}</div>
-                  </div>)
-                }
-            </div>
-          </div>  
-          
-          
+<div className='content-format h-96 md:h-[720px] mt-6 flex'>
+  <SideBar />
+  <div className='flex-1 p-6 space-y-6'>
+    <div className='flex flex-col md:flex-row items-start md:items-center gap-4'>
+      <input 
+        type="file" 
+        onChange={handleFileChange} 
+        ref={fileInputRef} 
+        name="fileinput" 
+        accept='image/*'
+        className='border border-gray-300 rounded-md p-2 text-sm text-black bg-white'
+      />
+      <button 
+        type="button" 
+        className='px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50'
+        onClick={handleUpload}
+        disabled={!canUpload}
+      >
+        Upload
+      </button>  
     </div>
+    <div className='space-y-4'>
+      <h3 className='text-lg font-semibold'>My Files</h3>
+      <div className='space-y-3'>
+        {fileList?.map((file, index) => (
+          <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
+          <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
+          <div className='flex-1 font-medium'>{file.title}</div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className='p-2 rounded-full hover:bg-black'>
+                <MoreVertIcon />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='bg-white border rounded-md shadow-lg'>
+                <DropdownMenuItem 
+                  className='px-4 py-2 text-red-600'
+                  onClick={() => handleFileDeletion(user.id, file.key)}
+                >
+                  Delete
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className='px-4 py-2'
+                  onClick={() => navigator.clipboard.writeText(`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`)}
+                >
+                  Copy URL
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
   )
 }
 

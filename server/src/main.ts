@@ -2,15 +2,17 @@ import express, { Request, Response } from "express";
 
 import cors from "cors"
 const multer = require("multer")
-import { HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from "crypto";
-import { dummyData } from "../dummyData/dummy";
+// import { dummyData } from "../dummyData/dummy";
 // import check from "../sendData/check";
 import dotenv from "dotenv";
-import { addFile, createUser, getAllFilesByUser, getAllUsers } from "../db/queries";
+import { addFile, createUser, deleteFileObj, getAllFilesByUser, getAllUsers, test_connection } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
-import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
+// import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
+// const { expressWithAuth, requireAuth } = require('@clerk/clerk-sdk-node');
 // import { clerkClient, requireAuth } from '@clerk/express'
+import { clerkMiddleware, requireAuth } from '@clerk/express'
 import redis, { createClient } from "redis";
 
 
@@ -19,15 +21,9 @@ dotenv.config()
 
 const app = express();
 
-declare global {
-  namespace Express {
-    interface Request extends StrictAuthProp {}
-  }
-}
-
 app.use(cors());
 app.use(express.json()); 
-const randomImageId = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
+const randomImageId = (bytes = 8) => crypto.randomBytes(bytes).toString("hex");
 
 const bucketName = process.env.BUCKET_NAME!;
 const bucketRegion = process.env.BUCKET_REGION!;
@@ -63,7 +59,7 @@ const checkIfUserExists = async (currentUser: any) => {
   if(users.includes(currentUser.id)){
     console.log('user exists!', users);
   } else {
-    createUser(currentUser)
+    await createUser(currentUser)
   }
 }
 
@@ -78,36 +74,32 @@ const s3 = new S3Client({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
 app.get("/api/", async (req: Request, res) => {
   res.send("Server is up!")
 });
 
 // To verify the current user
-app.get("/:id/verify-user", async (req: Request, res) => {
+app.get("/api/:id/verify-user", requireAuth(), async (req: Request, res) => {
   const userId = req.params.id;
   const userString = await redisClient.get(`user:${userId}`)
   if (!userString) {
     const user = await clerkClient.users.getUser(userId);
     // console.log(userId); 
     await redisClient.set(`user:${userId}`, JSON.stringify(user))
-    checkIfUserExists(user)
+    await checkIfUserExists(user)
   } else{
-    checkIfUserExists(JSON.parse(userString!));
+    await checkIfUserExists(JSON.parse(userString!));
   }
-  //console.log(JSON.parse(userString!).id);  
-  res.redirect(`/api/${userId}/user-apps`);
+  console.log("userString: ", JSON.parse(userString!).firstName);  
+  res.send({authenticated: 'yes'})
 });
 
-app.get("/api/:id/user-apps/", async (req:Request, res: Response) => {
-  res.send(dummyData);
-});
 
 app.get("/api/s3-upload", (req: Request, res: Response) => {
   res.send("upload route");
 });
 
-app.get("/api/:id/all-files", async (req, res) => {
+app.get("/api/:id/all-files", requireAuth(), async (req, res) => {
   const userId = req.params.id;
   // const user = await clerkClient.users.getUser(userId);
   const userString = await redisClient.get(`user:${userId}`)
@@ -116,34 +108,88 @@ app.get("/api/:id/all-files", async (req, res) => {
   res.send(files)
 })
 
+
+
 // Uplaoding files to s3 
-app.post("/api/:id/s3-upload/", upload.single("file"), async (req: Request, res: Response) => {
+app.post("/api/:id/s3-upload/", upload.single("file"), requireAuth(), async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
-    const userString = await redisClient.get(`user:${userId}`)
-    const user = await JSON.parse(userString!)
+
+    // Fetch user from Redis
+    const userString = await redisClient.get(`user:${userId}`);
+    if (!userString) {
+      res.status(404).send({ status: 'User not found in cache' });
+      return; // Return to avoid further execution
+    }
+    const user = JSON.parse(userString);
+
+    // Check if file exists in the request
+    if (!req.file) {
+      res.status(400).send({ status: 'No file uploaded' });
+      return; // Return after sending the response
+    }
+
+    // Validate user email
+    const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
+    if (!emailAddress) {
+      res.status(400).send({ status: 'User email not found' });
+      return; // Return after sending the response
+    }
+
+    // Set up parameters for S3 upload
     const params = {
       Bucket: bucketName,
       Key: randomImageId(),
-      Body: req.file?.buffer,
-      ContentType: req.file?.mimetype,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
     };
+
     const userFile = {
       id: params.Key,
-      title: req.file?.originalname,
-      uploaderId: req.params.id,
+      title: req.file.originalname,
+      uploaderId: userId,
       key: params.Key
-    }
+    };
+
+    // Upload to S3
     const putObjCommand = new PutObjectCommand(params);
-    console.log(user?.emailAddresses[0].emailAddress);
-    addFile(user?.emailAddresses[0].emailAddress, userFile)
     await s3.send(putObjCommand);
-    // console.log("File name: ", params.Key);
-    res.status(200).send({ status: `${req.file?.originalname} is uploaded!` });
+
+    // Add file info to your database or storage system
+    await addFile(emailAddress, userFile);
+
+    // Respond with success message
+    res.status(200).send({ status: `${req.file.originalname} is uploaded!` });
   } catch (err) {
-    res.status(500).send({ status: err });
+    // Log and handle error properly
+    console.error("Upload error:", err);
+    res.status(500).send({ status: err instanceof Error ? err.message : 'Unknown error' });
   }
 });
+
+app.delete("/api/:id/delete-object/:fileKey", requireAuth(), async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userString = await redisClient.get(`user:${userId}`)
+    const user = JSON.parse(userString!);
+    const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
+
+    if (!emailAddress) {
+      res.status(400).send({ status: 'User email not found' });
+      return; // Return after sending the response
+    }
+
+  const fileKey = req.params.fileKey;
+    const bucketParams = { Bucket: bucketName, Key: fileKey };
+    const deleteFile = new DeleteObjectCommand(bucketParams);
+    await s3.send(deleteFile);
+    await deleteFileObj(emailAddress, fileKey)
+    res.status(200).send({ status: 'file is deleted' });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).send({ status: error instanceof Error ? error.message : 'Unknown error' });
+  }
+} )
 
 
 
@@ -167,16 +213,20 @@ async function getFileDetails(bucketName: string, key: string) {
   }
 }
 
-app.get("/api/:id/file-details", async (req, res) => {
-  const userId = req.params.id;
+
+
+app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
+const userId = req.params.id;
   const userString = await redisClient.get(`user:${userId}`)
-  const usage = await redisClient.get(`userFiles:${userId}`)
+  //const usage = await redisClient.get(`userFiles:${userId}`)
   
   // const user = await clerkClient.users.getUser(userId);
   let sum = 0;
-  if (usage) {
-    sum = JSON.parse(usage);
-  } else {
+  // if (usage) {
+  //   console.log('redis hit');
+  //   sum = JSON.parse(usage);
+  // } else {
+    // console.log('no hit redis');
     const files = await getAllFilesByUser(JSON.parse(userString!))
     const allFilesDetails = await Promise.all(
       (files || []).map(file => getFileDetails(bucketName, file.key))
@@ -187,11 +237,15 @@ app.get("/api/:id/file-details", async (req, res) => {
       sum += num
      }
     })
-    await redisClient.set(`userFiles:${userId}`, JSON.stringify(sum))
-  }
+  // }
   res.send({appSize: sum})
 })
 
-app.listen(3000, () => {
-  console.log(`Server running at http://13.60.182.170:3000`);
+app.get('/api/protected', requireAuth(), (req, res) => {
+  res.send('This is a protected route')
+})
+
+const port = 3000
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });

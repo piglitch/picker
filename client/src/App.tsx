@@ -9,6 +9,7 @@ import CdnAppOverview from './components/cdnAppOverview';
 import CdnAppFiles from './components/cdnAppFiles';
 import CdnAppSettings from './components/cdnAppSettings';
 import NotFound from './components/ErrorFile';
+import About from './components/about';
 
 function App() {
   const router = createBrowserRouter([ 
@@ -25,7 +26,11 @@ function App() {
         //   element: <NewApp />
         // },
         {
-          path: "/user/:id/overview",
+          path: "/about",
+          element: <About />
+        },
+        {
+          path: "/user/:id/usage",
           element: <CdnAppOverview />
         },
         {

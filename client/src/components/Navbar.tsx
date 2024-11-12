@@ -3,21 +3,22 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const { user } = useClerk();
-  console.log(user?.id);
+
    return (
     <nav className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-x-6 p-6 lg:px-8">
       <div className="text-2xl my-auto">
         <Link to="/">
-          <span className="text-violet-500">pic</span>ker
-          <span className="text-yellow-400">.</span>
+          picker.
         </Link>
       </div>
       <div className="my-auto flex justify-between gap-6">
         <SignedOut>
-          <SignInButton forceRedirectUrl={`/user/${user?.id}/overview`} />
+          <Link to={"/about"}>About</Link>
+          <SignInButton />
         </SignedOut>
         <SignedIn>
-          <div><Link to={`/user/${user?.id}/overview`}>Dashboard</Link></div>
+          <Link to={"/about"}>About</Link>
+          <div><Link to={`/user/${user?.id}/files/`}>Dashboard</Link></div>
           <UserButton />
         </SignedIn>
       </div>

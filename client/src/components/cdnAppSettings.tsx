@@ -20,7 +20,7 @@ const CdnAppSettings = () => {
 
   //const currApp = appDetails?.userApps.filter(app => app.appId === id)[0]
   return (
-    <div className='content-format h-96 md:h-[720px] mt-6 flex border rounded-md bg-gray-200 text-black'>
+    <div className='content-format flex h-96 md:h-[720px] mt-6'>
       <SideBar />
       <div className='content-format'>
         <label>Filename </label>

@@ -8,6 +8,10 @@ export default defineConfig({
     react(),
     checker({ typescript: false }),
   ],
+ server: {
+    host: true,
+    port: 5173,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
