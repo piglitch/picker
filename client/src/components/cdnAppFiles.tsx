@@ -22,7 +22,10 @@ const CdnAppFiles = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fetcher = async() => {  
     // const token = await clerk.session?.getToken();
-    const data = await fetchFilesS3(user?.id)
+    let data = await fetchFilesS3(user?.id)
+	if(!data){
+	data = [];		
+	}
     console.log(data);
     setFileList(data)
     const appSizeInBytes =  await fetchFileSizesS3(user?.id)

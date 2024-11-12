@@ -108,6 +108,8 @@ app.get("/api/:id/all-files", requireAuth(), async (req, res) => {
   res.send(files)
 })
 
+
+
 // Uplaoding files to s3 
 app.post("/api/:id/s3-upload/", upload.single("file"), requireAuth(), async (req: Request, res: Response): Promise<void> => {
   try {
@@ -189,6 +191,8 @@ app.delete("/api/:id/delete-object/:fileKey", requireAuth(), async (req, res) =>
   }
 } )
 
+
+
 async function getFileDetails(bucketName: string, key: string) {
   try {
     // Set the parameters for the command
@@ -209,18 +213,20 @@ async function getFileDetails(bucketName: string, key: string) {
   }
 }
 
+
+
 app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
-  const userId = req.params.id;
+const userId = req.params.id;
   const userString = await redisClient.get(`user:${userId}`)
-  const usage = await redisClient.get(`userFiles:${userId}`)
+  //const usage = await redisClient.get(`userFiles:${userId}`)
   
   // const user = await clerkClient.users.getUser(userId);
   let sum = 0;
-  if (usage) {
-    console.log('redis hit');
-    sum = JSON.parse(usage);
-  } else {
-    console.log('no hit redis');
+  // if (usage) {
+  //   console.log('redis hit');
+  //   sum = JSON.parse(usage);
+  // } else {
+    // console.log('no hit redis');
     const files = await getAllFilesByUser(JSON.parse(userString!))
     const allFilesDetails = await Promise.all(
       (files || []).map(file => getFileDetails(bucketName, file.key))
@@ -231,8 +237,7 @@ app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
       sum += num
      }
     })
-    await redisClient.set(`userFiles:${userId}`, JSON.stringify(sum))
-  }
+  // }
   res.send({appSize: sum})
 })
 
