@@ -20,7 +20,7 @@ const CdnAppOverView = () => {
     await fetchReq(user?.id.toString())
     // setAppDetails(user.id);
     const appSizeInBytes =  await fetchFileSizesS3(user?.id.toString())
-    console.log("user id at oview", user?.id);
+    console.log(appSizeInBytes);
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
     setAppSize(parseFloat(appSizeInMB(appSizeInBytes).toFixed(2)));
   }

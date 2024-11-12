@@ -32,14 +32,14 @@ const SideBar = () => {
         </div>
       </Link>
       
-      <Link to={`/user/${params.id}/settings/`}>
+      {/* <Link to={`/user/${params.id}/settings/`}>
         <div className='p-1 rounded-md hover:text-green-600'>
           Settings
           <span className="text-red-600 ml-2 font-bold mt-auto">
             {dot && getLastXLetters(location.pathname, 9) === 'settings/' ? <span className="h-2 w-2  bg-red-600 rounded-full inline-block"></span>: ''}
           </span>
         </div>
-      </Link>      
+      </Link>       */}
     </div>
   )
 }

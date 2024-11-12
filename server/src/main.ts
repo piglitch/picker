@@ -20,15 +20,6 @@ import redis, { createClient } from "redis";
 dotenv.config()
 
 const app = express();
-// app.use(clerkMiddleware())
-
-// app.use(expressWithAuth());
-
-// declare global {
-//   namespace Express {
-//     interface Request extends StrictAuthProp {}
-//   }
-// }
 
 app.use(cors());
 app.use(express.json()); 
@@ -82,7 +73,6 @@ const s3 = new S3Client({
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 
 app.get("/api/", async (req: Request, res) => {
   res.send("Server is up!")
@@ -175,7 +165,6 @@ app.post("/api/:id/s3-upload/", upload.single("file"), requireAuth(), async (req
   }
 });
 
-
 app.delete("/api/:id/delete-object/:fileKey", requireAuth(), async (req, res) => {
   try {
     const userId = req.params.id;
@@ -199,7 +188,6 @@ app.delete("/api/:id/delete-object/:fileKey", requireAuth(), async (req, res) =>
     res.status(500).send({ status: error instanceof Error ? error.message : 'Unknown error' });
   }
 } )
-
 
 async function getFileDetails(bucketName: string, key: string) {
   try {
@@ -247,11 +235,6 @@ app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
   }
   res.send({appSize: sum})
 })
-
-// app.get("/api/:id/test-conn", requireAuth(), async (req, res) => {
-//   const userList = test_connection()
-//   res.send({status: "ok", users: userList})
-// })
 
 app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')

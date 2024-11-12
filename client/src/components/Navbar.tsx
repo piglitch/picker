@@ -13,9 +13,11 @@ const Navbar = () => {
       </div>
       <div className="my-auto flex justify-between gap-6">
         <SignedOut>
+          <Link to={"/about"}>About</Link>
           <SignInButton />
         </SignedOut>
         <SignedIn>
+          <Link to={"/about"}>About</Link>
           <div><Link to={`/user/${user?.id}/files/`}>Dashboard</Link></div>
           <UserButton />
         </SignedIn>
