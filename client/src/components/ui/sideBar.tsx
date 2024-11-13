@@ -15,19 +15,18 @@ const SideBar = () => {
   return (
     <div className='sidebar flex flex-col py-4 gap-2 w-1/6 mt-8'> 
       <Link to={`/user/${params.id}/files/`}>
-        <div className='p-1 rounded-md hover:text-green-600'>
-          Files  
-          <span className="text-red-600 ml-2 font-bold mt-auto">
-            {dot && getLastXLetters(location.pathname, 6) === 'files/' ? <span className="h-2 w-2  bg-red-600 rounded-full inline-block"></span>: ''}
+        <div className='p-1 w-20 rounded-md hover:text-green-600'>
+          File<span>
+            {dot && getLastXLetters(location.pathname, 6) === 'files/' ? <span className="text-red-600 bg-black">s</span>: ''}
           </span>
         </div>  
       </Link>
 
       <Link to={`/user/${params.id}/usage/`}>
-        <div className='p-1 rounded-md hover:text-green-600'>
-          Usage
-          <span className="text-red-600 ml-2 font-bold mt-auto">
-            {dot && getLastXLetters(location.pathname, 6) === 'usage/' ? <span className="h-2 w-2  bg-red-600 rounded-full inline-block"></span>: ''}
+        <div className='p-1 w-20 rounded-md hover:text-green-600'>
+          Usag
+          <span>
+            {dot && getLastXLetters(location.pathname, 6) === 'usage/' ? <span  className="text-red-600 bg-black">e</span>: 'e'}
           </span>
         </div>
       </Link>

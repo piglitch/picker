@@ -90,7 +90,7 @@ const CdnAppFiles = () => {
         ref={fileInputRef} 
         name="fileinput" 
         accept='image/*'
-        className='border border-gray-300 rounded-md p-2 text-sm text-black bg-white'
+        className='border border-gray-300 rounded-md w-64 p-2 text-sm text-black bg-white'
       />
       <button 
         type="button" 

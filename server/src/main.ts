@@ -12,7 +12,7 @@ import { createClerkClient } from "@clerk/backend";
 // import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // const { expressWithAuth, requireAuth } = require('@clerk/clerk-sdk-node');
 // import { clerkClient, requireAuth } from '@clerk/express'
-import { clerkMiddleware, requireAuth } from '@clerk/express'
+import { requireAuth } from '@clerk/express'
 import redis, { createClient } from "redis";
 
 
