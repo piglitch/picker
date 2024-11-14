@@ -19,7 +19,7 @@ Picker is a Content Delivery Network (CDN) service tailored for developers. It a
 - **Storage**: AWS S3
 - **Database**: PostgreSQL
 - **Caching**: Redis
-- **Deployment**: AWS EC2 (Backend)
+- **Deployment**: AWS EC2 (t2.medium)
 
 ## Features
 
