@@ -14,7 +14,7 @@ Picker is a Content Delivery Network (CDN) service tailored for developers. It a
 ## Tech Stack
 
 - **Backend**: Node.js, Express
-- **Frontend**: Vite
+- **Frontend**: React
 - **Authentication**: Clerk
 - **Storage**: AWS S3
 - **Database**: PostgreSQL
