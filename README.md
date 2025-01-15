@@ -2,6 +2,13 @@
 
 Picker is a Content Delivery Network (CDN) service tailored for developers. It allows users to securely upload, manage, and access assets like images, icons, and other files via a simple interface. Built with scalability and performance in mind, Picker is ideal for developers who need a reliable platform to host assets without storing them directly in their applications.
 
+## Why Choose Picker?
+
+- **Quick and Simple**: No complicated setup – just log in and start uploading your files.
+- **No Bank Account Required**: Use Picker without the hassle of linking a bank account.
+- **Seamless Integration**: Easily integrate hosted assets into your development projects using public URLs.
+- **Developer-Friendly**: Designed specifically with developers in mind, focusing on simplicity and performance.
+
 ## How It Works
 
 1. **Authentication**: Users sign up or log in using Clerk for secure and easy authentication.
