@@ -88,6 +88,10 @@ const s3 = new S3Client({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+app.get("/", async (req: Request, res) => {
+  res.send("Server route");
+});
+
 app.get("/api/", async (req: Request, res) => {
   res.send("Server is up!");
 });
