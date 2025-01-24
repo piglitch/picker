@@ -12,7 +12,7 @@ import { createClerkClient } from "@clerk/backend";
 // import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 // const { expressWithAuth, requireAuth } = require('@clerk/clerk-sdk-node');
 // import { clerkClient, requireAuth } from '@clerk/express'
-import { requireAuth } from '@clerk/express'
+import { clerkMiddleware, requireAuth } from '@clerk/express'
 import redis, { createClient } from "redis";
 
 
@@ -46,20 +46,34 @@ let updatedUser = {
 };
 
 const checkIfUserExists = async (currentUser: any) => {
-  users = []
-  updatedUser = { 
+  if (!currentUser || !currentUser.id) {
+    console.error('Invalid user data');
+    return;
+  }
+
+  let users = [];
+  const updatedUser = { 
     id: currentUser.id, 
     name: currentUser.fullName, 
     email: currentUser.emailAddresses[0].emailAddress
   };
-  const userList = await getAllUsers()
-  for(let i = 0; i < userList?.length!; i++){
-    users.push(userList![i])
+
+  const userList = await getAllUsers();
+  
+  // Ensure userList is defined
+  if (!userList) {
+    console.error('User list is not available');
+    return;
   }
-  if(users.includes(currentUser.id)){
-    console.log('user exists!', users);
+
+  for (let i = 0; i < userList.length; i++) {
+    users.push(userList[i]);
+  }
+
+  if (users.includes(currentUser.id)) {
+    console.log('User exists!', users);
   } else {
-    await createUser(currentUser)
+    await createUser(currentUser);
   }
 }
 
@@ -75,25 +89,57 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.get("/api/", async (req: Request, res) => {
-  res.send("Server is up!")
+  res.send("Server is up!");
 });
 
 // To verify the current user
-app.get("/api/:id/verify-user", requireAuth(), async (req: Request, res) => {
-  const userId = req.params.id;
-  const userString = await redisClient.get(`user:${userId}`)
-  if (!userString) {
-    const user = await clerkClient.users.getUser(userId);
-    // console.log(userId); 
-    await redisClient.set(`user:${userId}`, JSON.stringify(user))
-    await checkIfUserExists(user)
-  } else{
-    await checkIfUserExists(JSON.parse(userString!));
-  }
-  console.log("userString: ", JSON.parse(userString!).firstName);  
-  res.send({authenticated: 'yes'})
-});
+app.get(
+  "/api/:id/verify-user",
+  requireAuth(),
+  async (req: Request, res: Response): Promise<void> => {
+    const userId = req.params.id;
 
+    try {
+      // Attempt to fetch user from Redis cache
+      const userString = await redisClient.get(`user:${userId}`);
+      let user;
+
+      if (!userString) {
+        console.log('User not found in cache, fetching from Clerk...');
+
+        // Fetch user from Clerk
+        user = await clerkClient.users.getUser(userId);
+
+        if (!user) {
+          console.error(`User with ID ${userId} not found in Clerk`);
+          res.status(404).send({ error: 'User not found' }); // Do not `return` this
+          return;
+        }
+
+        // Store user in Redis cache for future requests
+        await redisClient.set(`user:${userId}`, JSON.stringify(user));
+      } else {
+        // Parse cached user data
+        user = JSON.parse(userString);
+
+        if (!user || !user.id) {
+          console.error('Invalid cached user data');
+          res.status(500).send({ error: 'Internal server error' }); // Do not `return` this
+          return;
+        }
+      }
+
+      // Check if the user exists in your database
+      await checkIfUserExists(user);
+
+      console.log("User verified successfully");
+      res.send({ authenticated: 'yes' }); // Do not `return` this
+    } catch (error) {
+      console.error('Error during user verification:', error);
+      res.status(500).send({ error: 'Internal server error' }); // Do not `return` this
+    }
+  }
+);
 
 app.get("/api/s3-upload", (req: Request, res: Response) => {
   res.send("upload route");

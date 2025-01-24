@@ -25,10 +25,12 @@ function App() {
         //   path: "/dashboard/new-app",
         //   element: <NewApp />
         // },
-        {
+
+	{
           path: "/about",
           element: <About />
-        },
+        }, 
+
         {
           path: "/user/:id/usage",
           element: <CdnAppOverview />
@@ -42,7 +44,8 @@ function App() {
           element: <CdnAppSettings />
         }
       ],
-    }, 
+    },
+
     {
       path: "*",
       element: <NotFound />

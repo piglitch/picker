@@ -13,20 +13,21 @@ const SideBar = () => {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
   return (
-    <div className='sidebar flex flex-col py-4 gap-2 w-1/6 mt-8'> 
+
+    <div className='sidebar flex justify-center lg:inline-block py-4 gap-24 lg:gap-2 lg:w-1/6 mt-8'> 
       <Link to={`/user/${params.id}/files/`}>
-        <div className='p-1 w-20 rounded-md hover:text-green-600'>
+        <div className='p-1 w-20 underline text-center lg:mb-4 rounded-md hover:text-green-600'>
           File<span>
-            {dot && getLastXLetters(location.pathname, 6) === 'files/' ? <span className="text-red-600 bg-black">s</span>: ''}
+            {dot && getLastXLetters(location.pathname, 6) === 'files/' ? <span className="text-red-600 bg-black">s</span>: 's'}
           </span>
         </div>  
       </Link>
 
       <Link to={`/user/${params.id}/usage/`}>
-        <div className='p-1 w-20 rounded-md hover:text-green-600'>
+        <div className='p-1 w-20 underline text-center rounded-md hover:text-green-600'>
           Usag
           <span>
-            {dot && getLastXLetters(location.pathname, 6) === 'usage/' ? <span  className="text-red-600 bg-black">e</span>: 'e'}
+            {dot && getLastXLetters(location.pathname, 6) === 'usage/' ? <span className="text-red-600 bg-black">e</span>: 'e'}
           </span>
         </div>
       </Link>

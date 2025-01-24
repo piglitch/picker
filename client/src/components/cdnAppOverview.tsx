@@ -29,11 +29,11 @@ const CdnAppOverView = () => {
   }, []);
  
   return (
-    <div className='content-format flex h-96 md:h-[720px] mt-6'>
+    <div className='content-format h-96 md:h-[720px] mt-6 lg:flex'>
       <SideBar />
       {
         appsize >= 0 ?
-        <div className='w-5/6 px-6'>
+        <div className='lg:w-5/6 px-6'>
           <div className='mt-4 rounded-md h-[500px] w-lg'>
             <Gauge 
               className='mx-auto' 

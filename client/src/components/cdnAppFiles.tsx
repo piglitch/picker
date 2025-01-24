@@ -23,17 +23,15 @@ const CdnAppFiles = () => {
   const fetcher = async() => {  
     // const token = await clerk.session?.getToken();
     let data = await fetchFilesS3(user?.id)
-	if(!data){
-	data = [];		
-	}
-    console.log(data);
+    if(!data){
+    data = [];		
+    }
     setFileList(data)
     const appSizeInBytes =  await fetchFileSizesS3(user?.id)
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
     setCanUpload(appSizeInMB(appSizeInBytes) < 500)
     console.log(appSizeInMB(appSizeInBytes));
   }
-
   useEffect(() => {
     fetcher();
   }, [fileList.length]);
@@ -80,7 +78,7 @@ const CdnAppFiles = () => {
   }
 
   return (
-<div className='content-format h-96 md:h-[720px] mt-6 flex'>
+<div className='content-format h-96 md:h-[720px] mt-6 lg:flex'>
   <SideBar />
   <div className='flex-1 p-6 space-y-6'>
     <div className='flex flex-col md:flex-row items-start md:items-center gap-4'>
@@ -90,7 +88,7 @@ const CdnAppFiles = () => {
         ref={fileInputRef} 
         name="fileinput" 
         accept='image/*'
-        className='border border-gray-300 rounded-md w-64 p-2 text-sm text-black bg-white'
+        className='border border-gray-300 rounded-md p-2 text-sm text-black bg-white'
       />
       <button 
         type="button" 
@@ -102,7 +100,8 @@ const CdnAppFiles = () => {
       </button>  
     </div>
     <div className='space-y-4'>
-      <h3 className='text-lg font-semibold'>My Files</h3>
+      <h1 className='font-semibold'>My Files</h1>
+      <hr className='text-green-600' />
       <div className='space-y-3'>
         {fileList?.map((file, index) => (
           <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
