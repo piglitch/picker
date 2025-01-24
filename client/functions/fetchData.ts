@@ -7,7 +7,7 @@ const clerk = new Clerk(clerkPubKey)
 clerk.load()
 export const fetchReq = async(userId: string | undefined) => {  
   const token = await clerk.session?.getToken();
-  const res = await fetch(`http://${hostName}/api/${userId}/verify-user`, 
+  const res = await fetch(`https://${hostName}/api/${userId}/verify-user`, 
     { mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,
@@ -21,7 +21,7 @@ export const fetchReq = async(userId: string | undefined) => {
 
 export const uploadFile = async(userId: string | undefined, formData: BodyInit | null) => {  
   const token = await clerk.session?.getToken();
-  const response = await fetch(`http://${hostName}/api/${userId}/s3-upload/`, 
+  const response = await fetch(`https://${hostName}/api/${userId}/s3-upload/`, 
     { 
       method: 'POST',
       body: formData,
@@ -37,7 +37,7 @@ export const uploadFile = async(userId: string | undefined, formData: BodyInit |
 export async function fetchFilesS3(userId: string | undefined) {
   try {
     const token = await clerk.session?.getToken();
-    const response = await fetch(`http://${hostName}/api/${userId}/all-files/`,
+    const response = await fetch(`https://${hostName}/api/${userId}/all-files/`,
       { mode: 'cors', 
         headers: {
           Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ export async function fetchFilesS3(userId: string | undefined) {
 export async function fetchFileSizesS3(userId: string | undefined) {
   try {
     const token = await clerk.session?.getToken();
-    const response = await fetch(`http://${hostName}/api/${userId}/file-details`, {
+    const response = await fetch(`https://${hostName}/api/${userId}/file-details`, {
       mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,
@@ -81,7 +81,7 @@ export async function deleteFile(userId: string | undefined, fileKey: string) {
   try {
     console.log(userId, fileKey);
     const token = await clerk.session?.getToken();
-    const deleteFile = await fetch(`http://${hostName}/api/${userId}/delete-object/${fileKey}/`,
+    const deleteFile = await fetch(`https://${hostName}/api/${userId}/delete-object/${fileKey}/`,
       { 
         method: "DELETE",
         mode: 'cors', 
