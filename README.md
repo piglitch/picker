@@ -1,114 +1,40 @@
+# Picker - A CDN for Developer Assets
 
-# Picker
+Picker is a Content Delivery Network (CDN) service tailored for developers. It allows users to securely upload, manage, and access assets like images, icons, and other files via a simple interface. Built with scalability and performance in mind, Picker is ideal for developers who need a reliable platform to host assets without storing them directly in their applications.
 
-A content delivery network (CDN) application that enables users to securely upload, store, and retrieve image files. Built with Node.js, Express, AWS S3, PostgreSQL, Clerk for authentication, and Prisma as the ORM.
+## Why Choose Picker?
 
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Database Setup](#database-setup)
-- [Running the Project](#running-the-project)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Future Enhancements](#future-enhancements)
+- **Quick and Simple**: No complicated setup – just log in and start uploading your files.
+- **No Bank Account Required**: Use Picker without the hassle of linking a bank account.
+- **Seamless Integration**: Easily integrate hosted assets into your development projects using public URLs.
+- **Developer-Friendly**: Designed specifically with developers in mind, focusing on simplicity and performance.
 
-## Features
-- Secure user authentication with Clerk
-- Image storage with AWS S3
-- PostgreSQL integration for metadata management
-- Efficient image retrieval by user ID
+## How It Works
+
+1. **Authentication**: Users sign up or log in using Clerk for secure and easy authentication.
+2. **File Uploads**: Authenticated users can upload their files, which are securely stored in an AWS S3 bucket.
+3. **File Management**: Each uploaded file is tagged with a unique identifier linked to the user, enabling efficient retrieval of all files associated with a specific user.
+4. **Data Management**: PostgreSQL is used to store metadata for each file, including user details, file IDs, and other relevant information, which simplifies querying and file management.
+5. **Caching**: To optimize performance, user session and frequently accessed data are cached in Redis, reducing the need for repetitive database calls.
+6. **Public Access Links**: Uploaded files are accessible through unique URLs, making it easy for users to integrate their assets directly into their applications as CDN resources.
 
 ## Tech Stack
+
 - **Backend**: Node.js, Express
-- **Database**: PostgreSQL with Prisma ORM
-- **Storage**: AWS S3
+- **Frontend**: React
 - **Authentication**: Clerk
-- **ORM**: Prisma
+- **Storage**: AWS S3
+- **Database**: PostgreSQL
+- **Caching**: Redis
+- **Deployment**: AWS EC2 (t2.medium)
 
-## Getting Started
+## Features
 
-### Prerequisites
-- Node.js (v16 or above)
-- PostgreSQL database
-- AWS account (for S3 bucket)
-- Clerk account (for user authentication)
-
-Clone the repository:
-```bash
-git clone <repository-url>
-cd cdn-app
-```
-
-Install dependencies:
-```bash
-npm install
-```
-
-## Environment Variables
-
-Create a `.env` file in the root directory and add the following environment variables:
-
-```plaintext
-PORT=3000
-DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<database>
-AWS_ACCESS_KEY_ID=<your-aws-access-key>
-AWS_SECRET_ACCESS_KEY=<your-aws-secret-key>
-AWS_REGION=<your-aws-region>
-S3_BUCKET_NAME=<your-s3-bucket-name>
-CLERK_FRONTEND_API=<your-clerk-frontend-api>
-CLERK_API_KEY=<your-clerk-api-key>
-```
-
-## Database Setup
-
-Initialize the database with Prisma:
-```bash
-npx prisma migrate dev
-```
-
-Run the following command to generate Prisma client:
-```bash
-npx prisma generate
-```
-
-## Running the Project
-
-To start the server:
-```bash
-npm start
-```
-
-The server should be running on `http://localhost:3000`.
-
-## Usage
-
-1. **Register/Login**: Users authenticate through Clerk.
-2. **Upload Image**: Upload an image file to the CDN, which stores it in an S3 bucket and saves metadata to PostgreSQL.
-3. **Retrieve Images**: Fetch all images uploaded by a specific user based on user ID.
-
-## API Endpoints
-
-### Authentication
-Authentication is managed by Clerk. Make sure to include an authentication token in headers where required.
-
-### Image Upload
-- **Endpoint**: `/upload`
-- **Method**: `POST`
-- **Headers**: `{ "Authorization": "Bearer <token>" }`
-- **Description**: Upload an image. The server saves it in S3 and records metadata in PostgreSQL.
-
-### Retrieve Images by User
-- **Endpoint**: `/images/:userId`
-- **Method**: `GET`
-- **Headers**: `{ "Authorization": "Bearer <token>" }`
-- **Description**: Retrieves all images uploaded by a specified user.
-
-## Future Enhancements
-- Extend support for additional file types
-- Implement caching for faster image retrieval
-- Add analytics for tracking image access patterns
+- Secure and scalable storage of developer assets
+- Easy-to-use authentication and user management with Clerk
+- Efficient data management and caching to enhance performance
+- Public URLs for assets, ideal for use as a CDN in development projects
 
 ## License
+
 This project is licensed under the MIT License.
