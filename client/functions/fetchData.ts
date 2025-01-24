@@ -1,7 +1,7 @@
 import { Clerk } from '@clerk/clerk-js'
 
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY!
-const hostName = import.meta.env.VITE_REACT_APP_API_URL!
+const clerkPubKey = import.meta.env.CLERK_PUBLISHABLE_KEY!
+const hostName = import.meta.env.REACT_APP_API_URL!
 console.log(hostName);
 const clerk = new Clerk(clerkPubKey)
 clerk.load()
