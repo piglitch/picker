@@ -8,7 +8,9 @@ clerk.load()
 export const fetchReq = async(userId: string | undefined) => {  
   const token = await clerk.session?.getToken();
   const res = await fetch(`https://${hostName}/api/${userId}/verify-user`, 
-    { mode: 'cors', 
+    { 
+      method: 'GET',
+      mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,
       } 
@@ -38,7 +40,9 @@ export async function fetchFilesS3(userId: string | undefined) {
   try {
     const token = await clerk.session?.getToken();
     const response = await fetch(`https://${hostName}/api/${userId}/all-files/`,
-      { mode: 'cors', 
+      { 
+        method: 'GET',
+        mode: 'cors', 
         headers: {
           Authorization: `Bearer ${token}`,
         } 
@@ -60,6 +64,7 @@ export async function fetchFileSizesS3(userId: string | undefined) {
   try {
     const token = await clerk.session?.getToken();
     const response = await fetch(`https://${hostName}/api/${userId}/file-details`, {
+      method: 'GET',
       mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,
@@ -100,7 +105,9 @@ export async function test(){
   const token = await clerk.session?.getToken();
 
   const response = await fetch(`http://localhost:3000/api/protected`, 
-    { mode: 'cors', 
+    { 
+      method: 'GET',
+      mode: 'cors', 
       headers: {
         Authorization: `Bearer ${token}`,
       } 
