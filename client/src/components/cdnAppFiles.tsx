@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import SideBar from './ui/sideBar';
 import { useClerk } from '@clerk/clerk-react';
-import { deleteFile, fetchFileSizesS3, fetchFilesS3, uploadFile } from '../../functions/fetchData';
+import { deleteFile, fetchFileSizesS3, fetchFilesS3, fetchReq, uploadFile } from '../../functions/fetchData';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +15,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 
 const CdnAppFiles = () => {
-  const [fileList, setFileList] = useState([]);
+  const [fileList, setFileList] = useState([{key: "NA", title: "NA"}]);
   const [file, setFile] = useState<File | null>(null);
   const [canUpload, setCanUpload] = useState(true);
   const { session, user } = useClerk();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fetcher = async() => {  
     // const token = await clerk.session?.getToken();
+    await fetchReq(user?.id.toString())
     let data = await fetchFilesS3(user?.id)
     if(!data){
     data = [];		
@@ -103,10 +104,10 @@ const CdnAppFiles = () => {
       <h1 className='font-semibold'>My Files</h1>
       <hr className='text-green-600' />
       <div className='space-y-3'>
-        {fileList?.map((file, index) => (
+        {fileList[0].key != "NA" ? fileList?.map((file, index) => (
           <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
-          <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
-          <div className='flex-1 font-medium'>{file.title}</div>
+            <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
+            <div className='flex-1 font-medium'>{file.title}</div>
             <DropdownMenu>
               <DropdownMenuTrigger className='p-2 rounded-full hover:bg-black'>
                 <MoreVertIcon />
@@ -127,8 +128,8 @@ const CdnAppFiles = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        ))}
+          </div> )) : <div> You have not uploaded any file yet! </div>
+        }
       </div>
     </div>
   </div>

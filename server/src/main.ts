@@ -47,12 +47,12 @@ redisClient.set('foo', 'bar');
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
-// let users: object[]
-// let updatedUser = {
-//   id: null, 
-//   name: null, 
-//   email: null,
-// };
+let users: object[]
+let updatedUser = {
+  id: null, 
+  name: null, 
+  email: null,
+};
 
 const checkIfUserExists = async (currentUser: any) => {
   if (!currentUser || !currentUser.id) {
