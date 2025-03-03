@@ -33,17 +33,26 @@ const secretKey = process.env.SECRET_KEY!;
 // const clerk = new Clerk(process.env.CLERK_PUBLISHABLE_KEY!)
 // clerk.load()
 
-const redisClient = createClient();
+const redisClient = createClient({
+  username: 'default',
+  password: process.env.REDIS_PASS,
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: 14900
+  }
+});
+redisClient.on('error', err => console.log('Redis Client Error', err));
 redisClient.connect();
+redisClient.set('foo', 'bar');
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
-let users: object[]
-let updatedUser = {
-  id: null, 
-  name: null, 
-  email: null,
-};
+// let users: object[]
+// let updatedUser = {
+//   id: null, 
+//   name: null, 
+//   email: null,
+// };
 
 const checkIfUserExists = async (currentUser: any) => {
   if (!currentUser || !currentUser.id) {
