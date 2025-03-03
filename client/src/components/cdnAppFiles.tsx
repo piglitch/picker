@@ -37,9 +37,9 @@ const CdnAppFiles = () => {
     fetcher();
   }, [fileList.length]);
 
-  const handleFileDeletion = async(userId: string, fileKey: string) => {
+  const handleFileDeletion = async(userId: string, fileKey: string, index: number) => {
+    setFileList(fileList.splice(index, 1))
     await deleteFile(userId, fileKey)
-    await fetcher()
   }
 
   const handleFileChange = (e) => {
@@ -115,7 +115,7 @@ const CdnAppFiles = () => {
               <DropdownMenuContent className='bg-white border rounded-md shadow-lg'>
                 <DropdownMenuItem 
                   className='px-4 py-2 text-red-600'
-                  onClick={() => handleFileDeletion(user.id, file.key)}
+                  onClick={() => handleFileDeletion(user.id, file.key, index)}
                 >
                   Delete
                 </DropdownMenuItem>

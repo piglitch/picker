@@ -2,9 +2,9 @@ const HomePage = () => {
   return (
     <div className="h-max rounded-md">
       <div className="content-format">
-        <h1 className="text-3xl border rounded-2xl p-2 bg-black text-red-600">
+        {/* <h1 className="text-3xl border rounded-2xl p-2 bg-black text-red-600">
           Server is down at the moment. Will be fixed soon!
-        </h1>
+        </h1> */}
         <h1 className="text-6xl max-w-32 flex flex-col pt-44">
           <span className="font-extrabold">Fast</span>
           <span className="font-extrabold">Reliable</span> 
