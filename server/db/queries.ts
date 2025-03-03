@@ -1,17 +1,9 @@
-import { Pool } from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { createClerkClient } from '@clerk/backend'
 
 dotenv.config();
 
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_PUBLISHABLE_KEY })
-const connectionString = `${process.env.DATABASE_URL}`
-
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 
 export async function createUser(user: any) {
   try {
