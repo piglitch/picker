@@ -18,13 +18,13 @@ const About = () => {
 
       <h2 className="text-2xl font-semibold text-blue-500 mb-3">Technologies Used</h2>
       <ul className="list-disc list-inside text-gray-200 space-y-2 mb-6">
-        <li><strong>Backend</strong>: Node.js with Express, providing a stable and efficient server-side foundation.</li>
-        <li><strong>Authentication</strong>: Managed with Clerk for secure and seamless user management.</li>
-        <li><strong>Database</strong>: PostgreSQL, managed with Prisma ORM for reliable data handling.</li>
+        <li><strong>Backend</strong>: Node.js with Express.</li>
+        <li><strong>Authentication</strong>: Managed with Clerk.</li>
+        <li><strong>Database</strong>: PostgreSQL, with Prisma ORM.</li>
         <li><strong>Caching</strong>: Redis, to store user session data, reducing API calls and improving response times.</li>
-        <li><strong>Storage</strong>: AWS S3 for file storage, ensuring durability and accessibility for media assets.</li>
+        <li><strong>Storage</strong>: AWS S3 for file storage.</li>
         <li><strong>Deployment</strong>: Backend is hosted on Render and the Frontend is hosted on Vercel.</li>
-        <li><strong>Frontend</strong>: Built with React for efficient, component-based UI development.</li>
+        <li><strong>Frontend</strong>: React.</li>
       </ul>
 
       <h2 className="text-2xl font-semibold text-blue-500 mb-3">Get in Touch</h2>
