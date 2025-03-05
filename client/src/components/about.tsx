@@ -23,7 +23,7 @@ const About = () => {
         <li><strong>Database</strong>: PostgreSQL, managed with Prisma ORM for reliable data handling.</li>
         <li><strong>Caching</strong>: Redis, to store user session data, reducing API calls and improving response times.</li>
         <li><strong>Storage</strong>: AWS S3 for file storage, ensuring durability and accessibility for media assets.</li>
-        <li><strong>Deployment</strong>: Amazon EC2 with a self-signed SSL certificate for secure communications.</li>
+        <li><strong>Deployment</strong>: Backend is hosted on Render and the Frontend is hosted on Vercel.</li>
         <li><strong>Frontend</strong>: Built with React for efficient, component-based UI development.</li>
       </ul>
 
