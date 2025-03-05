@@ -5,12 +5,15 @@ import checker from 'vite-plugin-checker';
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({include: "**/*.tsx"}),
     checker({ typescript: false }),
   ],
  server: {
     host: true,
     port: 5173,
+    watch: {
+      usePolling: true
+    }
   },
   resolve: {
     alias: {
