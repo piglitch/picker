@@ -4,15 +4,10 @@ import cors from "cors";
 const multer = require("multer")
 import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from "crypto";
-// import { dummyData } from "../dummyData/dummy";
-// import check from "../sendData/check";
 import dotenv from "dotenv";
 import { addFile, createUser, deleteFileObj, getAllFilesByUser, getAllUsers, test_connection } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
-// import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
-// const { expressWithAuth, requireAuth } = require('@clerk/clerk-sdk-node');
-// import { clerkClient, requireAuth } from '@clerk/express'
-import { clerkMiddleware, requireAuth } from '@clerk/express'
+import { requireAuth } from '@clerk/express'
 import redis, { createClient } from "redis";
 
 
@@ -47,44 +42,40 @@ redisClient.set('foo', 'bar');
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
-let users: object[]
-let updatedUser = {
-  id: null, 
-  name: null, 
-  email: null,
-};
+// const checkIfUserExists = async (currentUser: any) => {
+//   if (!currentUser || !currentUser.id) {
+//     console.error('Invalid user data');
+//     return;
+//   }
 
-const checkIfUserExists = async (currentUser: any) => {
-  if (!currentUser || !currentUser.id) {
-    console.error('Invalid user data');
-    return;
-  }
+//   let users = [];
+//   const updatedUser = { 
+//     id: currentUser.id, 
+//     name: currentUser.fullName, 
+//     email: currentUser.emailAddresses[0].emailAddress
+//   };
 
-  let users = [];
-  const updatedUser = { 
-    id: currentUser.id, 
-    name: currentUser.fullName, 
-    email: currentUser.emailAddresses[0].emailAddress
-  };
-
-  const userList = await getAllUsers();
+//   const userList = await getAllUsers();
   
-  // Ensure userList is defined
-  if (!userList) {
-    console.error('User list is not available');
-    return;
-  }
+//   // Ensure userList is defined
+//   if (!userList) {
+//     console.error('User list is not available');
+//     return;
+//   }
 
-  for (let i = 0; i < userList.length; i++) {
-    users.push(userList[i]);
-  }
+//   for (let i = 0; i < userList.length; i++) {
+//     users.push(userList[i]);
+//   }
 
-  if (users.includes(currentUser.id)) {
-    console.log('User exists!', users);
-  } else {
-    await createUser(currentUser);
-  }
-}
+//   console.log(updatedUser.id, currentUser.id);
+
+//   if (users.includes(currentUser.id)) {
+//     console.log('User exists!', users);
+//   } else {
+//     console.log("db hit");
+//     await createUser(currentUser);
+//   }
+// }
 
 const s3 = new S3Client({
   credentials: {
@@ -143,9 +134,9 @@ app.get(
       }
 
       // Check if the user exists in your database
-      await checkIfUserExists(user);
+      // await checkIfUserExists(user);
 
-      console.log("User verified successfully");
+      // console.log("User verified successfully");
       res.send({ authenticated: 'yes' }); // Do not `return` this
     } catch (error) {
       console.error('Error during user verification:', error);
@@ -162,9 +153,15 @@ app.get("/api/:id/all-files", requireAuth(), async (req, res) => {
   const userId = req.params.id;
   // const user = await clerkClient.users.getUser(userId);
   const userString = await redisClient.get(`user:${userId}`)
-  const files = await getAllFilesByUser(JSON.parse(userString!))
-  console.log(files);
-  res.send(files)
+  const userFiles = await redisClient.get(`userFiles:${userId}`)
+  
+  if(userFiles == null) {
+    const files = await getAllFilesByUser(JSON.parse(userString!))
+    await redisClient.set(`userFiles:${userId}`, JSON.stringify(files))
+    console.log("from db");
+  } 
+  console.log(userFiles);
+  res.send(userFiles)
 })
 
 
@@ -217,6 +214,24 @@ app.post("/api/:id/s3-upload/", upload.single("file"), requireAuth(), async (req
     // Add file info to your database or storage system
     await addFile(emailAddress, userFile);
 
+    // Update files in redis
+    const files = await getAllFilesByUser(JSON.parse(userString!))
+    await redisClient.set(`userFiles:${userId}`, JSON.stringify(files))
+
+    // Update usage in redis
+    let sum = 0
+    const allFilesDetails = await Promise.all(
+      (files || []).map(file => getFileDetails(bucketName, file.key))
+    );
+    const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
+    resFilesDetails.forEach(num => { 
+     if (num) {
+      sum += num
+     }
+    })
+    await redisClient.set(`userUsage:${userId}`, sum)
+
+    console.log("redis update");
     // Respond with success message
     res.status(200).send({ status: `${req.file.originalname} is uploaded!` });
   } catch (err) {
@@ -238,11 +253,31 @@ app.delete("/api/:id/delete-object/:fileKey", requireAuth(), async (req, res) =>
       return; // Return after sending the response
     }
 
-  const fileKey = req.params.fileKey;
+    const fileKey = req.params.fileKey;
     const bucketParams = { Bucket: bucketName, Key: fileKey };
     const deleteFile = new DeleteObjectCommand(bucketParams);
     await s3.send(deleteFile);
     await deleteFileObj(emailAddress, fileKey)
+
+    // Update files in redis
+    const files = await getAllFilesByUser(JSON.parse(userString!))
+    await redisClient.set(`userFiles:${userId}`, JSON.stringify(files))
+
+    // Update usage in redis
+    let sum = 0
+    const allFilesDetails = await Promise.all(
+      (files || []).map(file => getFileDetails(bucketName, file.key))
+    );
+    const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
+    resFilesDetails.forEach(num => { 
+     if (num) {
+      sum += num
+     }
+    })
+    await redisClient.set(`userUsage:${userId}`, sum)
+
+    console.log("redis update");
+
     res.status(200).send({ status: 'file is deleted' });
   } catch (error) {
     console.error("Upload error:", error);
@@ -266,6 +301,7 @@ async function getFileDetails(bucketName: string, key: string) {
 
     // Print out the file details
     //console.log("File Details:", data);
+    console.log("collecting data");
     return data;
   } catch (error) {
     console.error("Error fetching file details:", error);
@@ -275,17 +311,17 @@ async function getFileDetails(bucketName: string, key: string) {
 
 
 app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
-const userId = req.params.id;
+  const userId = req.params.id;
   const userString = await redisClient.get(`user:${userId}`)
-  //const usage = await redisClient.get(`userFiles:${userId}`)
-  
+  const usage = await redisClient.get(`userUsage:${userId}`)
+  console.log("details: ", usage, "line 273")
   // const user = await clerkClient.users.getUser(userId);
   let sum = 0;
-  // if (usage) {
-  //   console.log('redis hit');
-  //   sum = JSON.parse(usage);
-  // } else {
-    // console.log('no hit redis');
+  if (usage != null) {
+    console.log('redis hit');
+    sum = JSON.parse(usage);
+  } else {
+    console.log('no redis hit');
     const files = await getAllFilesByUser(JSON.parse(userString!))
     const allFilesDetails = await Promise.all(
       (files || []).map(file => getFileDetails(bucketName, file.key))
@@ -296,7 +332,9 @@ const userId = req.params.id;
       sum += num
      }
     })
-  // }
+    await redisClient.set(`userUsage:${userId}`, sum)
+  }
+  console.log("check");
   res.send({appSize: sum})
 })
 

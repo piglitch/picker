@@ -21,14 +21,13 @@ const CdnAppFiles = () => {
   const { session, user } = useClerk();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fetcher = async() => {  
-    // const token = await clerk.session?.getToken();
     await fetchReq(user?.id.toString())
     let data = await fetchFilesS3(user?.id)
     if(!data){
     data = [];		
     }
     setFileList(data)
-    const appSizeInBytes =  await fetchFileSizesS3(user?.id)
+    const appSizeInBytes = await fetchFileSizesS3(user?.id)
     const appSizeInMB = (appSizeInBytes: number) => appSizeInBytes / 1024 / 1024
     setCanUpload(appSizeInMB(appSizeInBytes) < 500)
     console.log(appSizeInMB(appSizeInBytes));
@@ -38,8 +37,8 @@ const CdnAppFiles = () => {
   }, [fileList.length]);
 
   const handleFileDeletion = async(userId: string, fileKey: string, index: number) => {
-    setFileList(fileList.splice(index, 1))
     await deleteFile(userId, fileKey)
+    setFileList(fileList.splice(index, 1))
   }
 
   const handleFileChange = (e) => {
@@ -104,7 +103,7 @@ const CdnAppFiles = () => {
       <h1 className='font-semibold'>My Files</h1>
       <hr className='text-green-600' />
       <div className='space-y-3'>
-        {fileList[0].key != "NA" ? fileList?.map((file, index) => (
+        {fileList.length != 0 ? fileList?.map((file, index) => (
           <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
             <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
             <div className='flex-1 font-medium'>{file.title}</div>
