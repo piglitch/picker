@@ -113,7 +113,20 @@ const CdnAppFiles = () => {
       <h1 className='font-semibold'>My Files</h1>
       <hr className='text-green-600' />
       <div className='space-y-3'>
-        {isLoading ? (<div>Loading files...</div>) : fileList.length == 0 || fileList[0].key == "NA" ? <div> You have not uploaded any file yet! </div> : ( fileList?.map((file, index) => (
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                className="flex items-center justify-between gap-3 border-b pb-2 animate-breath"
+                key={index}
+              >
+                <div className="w-20 h-20 bg-gray-300 rounded" />
+                <div className="flex-1 h-6 bg-gray-300 rounded" />
+                <div className="w-8 h-8 bg-gray-300 rounded-full" />
+              </div>
+            ))}
+          </div>
+          ) : fileList.length == 0 || fileList[0].key == "NA" ? <div> You have not uploaded any file yet! </div> : ( fileList?.map((file, index) => (
           <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
             <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
             <div className='flex-1 font-medium'>{file.title}</div>
