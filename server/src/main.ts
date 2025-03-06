@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
-
-import cors from "cors"
+import cron from "node-cron";
+import cors from "cors";
 const multer = require("multer")
 import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from "crypto";
@@ -303,6 +303,10 @@ const userId = req.params.id;
 app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
+
+cron.schedule('*/30 * * * *', () => {
+  console.log('Server restarts every 30 minutes.');
+});
 
 const port = 3000
 app.listen(port, () => {
