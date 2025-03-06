@@ -103,7 +103,7 @@ const CdnAppFiles = () => {
       <h1 className='font-semibold'>My Files</h1>
       <hr className='text-green-600' />
       <div className='space-y-3'>
-        {fileList.length != 0 ? fileList?.map((file, index) => (
+        {fileList.length != 0 || fileList[0].key != "NA" ? fileList?.map((file, index) => (
           <div className='flex items-center justify-between gap-3 border-b pb-2' key={index}>
             <img width={80} src={`https://d3p8pk1gmty4gx.cloudfront.net/${file.key}`} />
             <div className='flex-1 font-medium'>{file.title}</div>
