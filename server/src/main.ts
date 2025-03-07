@@ -342,8 +342,9 @@ app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
 
-cron.schedule('*/30 * * * *', () => {
-  console.log('Server restarts every 30 minutes.');
+const interval = 14
+cron.schedule(`*/${interval} * * * *`, () => {
+  console.log(`Server restarts every ${interval} minutes.`);
 });
 
 const port = 3000
