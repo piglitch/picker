@@ -347,7 +347,7 @@ cron.schedule(`*/${interval} * * * *`, async () => {
   console.log(`Server restarts every ${interval} minutes.`);
   try {
     const resp = await fetch("https://api.pickercdn.com/api/healthz")
-    const data = await resp.json
+    const data = await resp.json();
     console.log("Health route response: ", data);
   } catch (error) {
     console.log(error);
