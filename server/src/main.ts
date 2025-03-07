@@ -145,8 +145,8 @@ app.get(
   }
 );
 
-app.get("/api/s3-upload", (req: Request, res: Response) => {
-  res.send("upload route");
+app.get("/api/healthz", (req: Request, res: Response) => {
+  res.send({status: "ok"});
 });
 
 app.get("/api/:id/all-files", requireAuth(), async (req, res) => {
@@ -343,8 +343,15 @@ app.get('/api/protected', requireAuth(), (req, res) => {
 })
 
 const interval = 14
-cron.schedule(`*/${interval} * * * *`, () => {
+cron.schedule(`*/${interval} * * * *`, async () => {
   console.log(`Server restarts every ${interval} minutes.`);
+  try {
+    const resp = await fetch("https://api.pickercdn.com/api/healthz")
+    const data = await resp.json
+    console.log("Health route response: ", data);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 const port = 3000
