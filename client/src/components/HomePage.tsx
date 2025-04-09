@@ -29,7 +29,7 @@ const HomePage = () => {
         &#169;	
         <a href="https://github.com/piglitch" target="_blank" rel="noopener noreferrer">
           <u>piglitch</u> 
-        </a>, 2024
+        </a>, 2025
       </footer>
     </div>
   )
