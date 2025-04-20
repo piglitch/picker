@@ -193,9 +193,12 @@ app.post("/api/:id/s3-upload/", upload.single("file"), requireAuth(), async (req
     }
 
     // Set up parameters for S3 upload
+    
+    const imageKey = `${userId}/${randomImageId()}` 
+
     const params = {
       Bucket: bucketName,
-      Key: randomImageId(),
+      Key: imageKey,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
     };
