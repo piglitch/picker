@@ -49,19 +49,29 @@ export async function addFile(emailAddress:string, file:any){
   const existingUser = await prisma.user.findUnique({
     where: { email: emailAddress },
   });
+
+  if (!existingUser) {
+    throw new Error(`User with email ${emailAddress} not found`);
+  }
+
   try {
-    const updatedUser = await prisma.file.create({
+    const createdFile = await prisma.file.create({
       data: {
         title: file.title!,
-        uploaderId: existingUser?.id!,
+        uploaderId: existingUser.id,
         key: file.key!,
+      },
+      include: {
+        uploader: true // Include the uploader relation in the response
       }
     })
-    console.log('File added! ', updatedUser);
+    console.log('File added! ', createdFile);
+    return createdFile;
   } catch (err) {
     console.error(err);
+    throw err;
   } finally {
-    prisma.$disconnect();
+    await prisma.$disconnect();
   }
 }
 

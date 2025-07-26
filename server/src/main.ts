@@ -62,37 +62,15 @@ app.get(
     try {
       // Attempt to fetch user from Redis cache
       const userString = await redisClient.get(`user:${userId}`);
-      let user;
-
+      let user = await clerkClient.users.getUser(userId);
+      console.log("line 66: ", user)
+      console.log('User not found in cache, fetching from Clerk...'); 
+      console.error(`User with ID ${userId} not found in Clerk`);
+      await createUser(user)
+      console.log(`${userId} is created.`)
       if (!userString) {
-        console.log('User not found in cache, fetching from Clerk...');
-
-        // Fetch user from Clerk
-        user = await clerkClient.users.getUser(userId);
-
-        if (!user) {
-          console.error(`User with ID ${userId} not found in Clerk`);
-          res.status(404).send({ error: 'User not found' }); // Do not `return` this
-          return;
-        }
-
-        // Store user in Redis cache for future requests
-        await redisClient.set(`user:${userId}`, JSON.stringify(user));
-      } else {
-        // Parse cached user data
-        user = JSON.parse(userString);
-
-        if (!user || !user.id) {
-          console.error('Invalid cached user data');
-          res.status(500).send({ error: 'Internal server error' }); // Do not `return` this
-          return;
-        }
+        await redisClient.set(`user:${userId}`, JSON.stringify(user)); 
       }
-
-      // Check if the user exists in your database
-      // await checkIfUserExists(user);
-
-      // console.log("User verified successfully");
       res.send({ authenticated: 'yes' }); // Do not `return` this
     } catch (error) {
       console.error('Error during user verification:', error);
