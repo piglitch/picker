@@ -6,7 +6,8 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/main.ts",
-    "migrate": "prisma migrate deploy"
+    "migrate": "prisma migrate deploy",
+    "start": "node src/main.ts"
   },
   "keywords": [],
   "author": "",

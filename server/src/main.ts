@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import cron from "node-cron";
+// import cron from "node-cron";
 import cors from "cors";
 const multer = require("multer")
 import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
@@ -345,17 +345,17 @@ app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
 
-const interval = 14
-cron.schedule(`*/${interval} * * * *`, async () => {
-  console.log(`Server restarts every ${interval} minutes.`);
-  try {
-    const resp = await fetch("https://api.pickercdn.com/api/healthz")
-    const data = await resp.json();
-    console.log("Health route response: ", data);
-  } catch (error) {
-    console.log(error);
-  }
-});
+// const interval = 14
+// cron.schedule(`*/${interval} * * * *`, async () => {
+//   console.log(`Server restarts every ${interval} minutes.`);
+//   try {
+//     const resp = await fetch("https://api.pickercdn.com/api/healthz")
+//     const data = await resp.json();
+//     console.log("Health route response: ", data);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 const port = 3000
 app.listen(port, () => {
