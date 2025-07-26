@@ -301,7 +301,7 @@ app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
 
-const port = 3000
+const port = process.env.PORT || 3000 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
