@@ -69,7 +69,7 @@ app.get(
       await createUser(user)
       console.log(`${userId} is created.`)
       if (!userString) {
-        await redisClient.set(`user:${userId}`, JSON.stringify(user)); 
+        await redisClient.set(`user:${userId}`, JSON.stringify(user))
       }
       res.send({ authenticated: 'yes' }); // Do not `return` this
     } catch (error) {
