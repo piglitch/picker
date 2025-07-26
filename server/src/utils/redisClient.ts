@@ -1,8 +1,7 @@
 // src/utils/redis.ts
 import Redis from "ioredis";
 
-const redisClient = new Redis(process.env.REDIS_URL as string);
-
+const redisClient = new Redis(process.env.REDIS_URL + '?family=0');
 redisClient.on("connect", () => {
   console.log("Connected to Redis");
 });
