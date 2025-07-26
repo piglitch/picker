@@ -8,7 +8,8 @@ import dotenv from "dotenv";
 import { addFile, createUser, deleteFileObj, getAllFilesByUser, getAllUsers, test_connection } from "../db/queries";
 import { createClerkClient } from "@clerk/backend";
 import { requireAuth } from '@clerk/express'
-import redis, { createClient } from "redis";
+import redisClient from "./utils/redisClient";
+// import redis, { createClient } from "redis";
 
 
 
@@ -25,10 +26,10 @@ const bucketRegion = process.env.BUCKET_REGION!;
 const accessKey = process.env.ACCESS_KEY!;
 const secretKey = process.env.SECRET_KEY!;
 
-const redisClient = createClient();
-redisClient.on('error', err => console.log('Redis Client Error', err));
-redisClient.connect();
-redisClient.set('foo', 'bar');
+// const redisClient = createClient();
+// redisClient.on('error', err => console.log('Redis Client Error', err));
+// redisClient.connect();
+// redisClient.set('foo', 'bar');
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
