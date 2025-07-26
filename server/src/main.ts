@@ -25,57 +25,12 @@ const bucketRegion = process.env.BUCKET_REGION!;
 const accessKey = process.env.ACCESS_KEY!;
 const secretKey = process.env.SECRET_KEY!;
 
-// const clerk = new Clerk(process.env.CLERK_PUBLISHABLE_KEY!)
-// clerk.load()
-
-const redisClient = createClient({
-  username: 'default',
-  password: process.env.REDIS_PASS,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: 14900
-  }
-});
+const redisClient = createClient();
 redisClient.on('error', err => console.log('Redis Client Error', err));
 redisClient.connect();
 redisClient.set('foo', 'bar');
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
-
-// const checkIfUserExists = async (currentUser: any) => {
-//   if (!currentUser || !currentUser.id) {
-//     console.error('Invalid user data');
-//     return;
-//   }
-
-//   let users = [];
-//   const updatedUser = { 
-//     id: currentUser.id, 
-//     name: currentUser.fullName, 
-//     email: currentUser.emailAddresses[0].emailAddress
-//   };
-
-//   const userList = await getAllUsers();
-  
-//   // Ensure userList is defined
-//   if (!userList) {
-//     console.error('User list is not available');
-//     return;
-//   }
-
-//   for (let i = 0; i < userList.length; i++) {
-//     users.push(userList[i]);
-//   }
-
-//   console.log(updatedUser.id, currentUser.id);
-
-//   if (users.includes(currentUser.id)) {
-//     console.log('User exists!', users);
-//   } else {
-//     console.log("db hit");
-//     await createUser(currentUser);
-//   }
-// }
 
 const s3 = new S3Client({
   credentials: {
@@ -344,18 +299,6 @@ app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
 app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
-
-// const interval = 14
-// cron.schedule(`*/${interval} * * * *`, async () => {
-//   console.log(`Server restarts every ${interval} minutes.`);
-//   try {
-//     const resp = await fetch("https://api.pickercdn.com/api/healthz")
-//     const data = await resp.json();
-//     console.log("Health route response: ", data);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
 
 const port = 3000
 app.listen(port, () => {

@@ -69,7 +69,7 @@ export async function deleteFileObj(emailAddress:string, fileId:string){
   try {
     const deleteFile = await prisma.file.delete({
       where: {
-        key: fileId!,
+        id: Number(fileId),
       },
     })
     console.log('File removed: ', deleteFile);
