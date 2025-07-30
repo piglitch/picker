@@ -44,9 +44,7 @@ const s3 = new S3Client({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// app.get("/", async (req: Request, res) => {
-//   res.send("Server route");
-// });
+
 
 app.get("/api/", async (req: Request, res) => {
   res.send("Server is up!");
@@ -278,6 +276,10 @@ app.get("/api/:id/file-details", requireAuth(), async (req, res) => {
 app.get('/api/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route')
 })
+
+app.get("/", async (req: Request, res) => {
+  res.send("Server route");
+});
 
 const port = process.env.PORT || 3000 
 app.listen(port, () => {
