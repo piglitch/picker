@@ -77,9 +77,10 @@ export async function addFile(emailAddress:string, file:any){
 
 export async function deleteFileObj(emailAddress:string, fileId:string){
   try {
+    console.log('Deleting file: ', fileId)
     const deleteFile = await prisma.file.delete({
       where: {
-        id: Number(fileId),
+        key: fileId,
       },
     })
     console.log('File removed: ', deleteFile);
@@ -98,6 +99,7 @@ export async function getAllFilesByUser(user: any){
     const filesByUser = await prisma.file.findMany({
       where: { uploaderId: currentUser?.id }
     })
+    console.log('Files by user: ', filesByUser);
     return filesByUser;
   } catch (error) {
     console.error(error);

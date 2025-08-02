@@ -148,7 +148,6 @@ app.post("/api/:id/s3-upload/", upload.single("file"), verifyClerkAuth, async (r
   }
 });
 
-// ✅ File Details
 app.get("/api/:id/file-details", verifyClerkAuth, async (req, res) => {
   const userId = req.params.id;
   const userString = await redisClient.get(`user:${userId}`);
@@ -173,12 +172,50 @@ app.get("/api/:id/file-details", verifyClerkAuth, async (req, res) => {
   res.send({ appSize: sum });
 });
 
-// ✅ Protected route test
-app.get("/api/protected", verifyClerkAuth, (req, res) => {
-  res.send("This is a protected route");
-});
+app.delete("/api/delete-object/:userId/:fileKey", verifyClerkAuth, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const fileKey = userId + '/' + req.params.fileKey;
+    const userString = await redisClient.get(`user:${userId}`)
+    const user = JSON.parse(userString!);
+    const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
 
-// ✅ Get file details helper
+    if (!emailAddress) {
+      res.status(400).send({ status: 'User email not found' });
+      return; // Return after sending the response
+    }
+
+    const bucketParams = { Bucket: bucketName, Key: fileKey };
+    const deleteFile = new DeleteObjectCommand(bucketParams);
+    await s3.send(deleteFile);
+    await deleteFileObj(emailAddress, fileKey)
+
+    // Update files in redis
+    const files = await getAllFilesByUser(JSON.parse(userString!))
+    await redisClient.set(`userFiles:${userId}`, JSON.stringify(files))
+
+    // Update usage in redis
+    let sum = 0
+    const allFilesDetails = await Promise.all(
+      (files || []).map(file => getFileDetails(bucketName, file.key))
+    );
+    const resFilesDetails = allFilesDetails?.map(file => file?.ContentLength);
+    resFilesDetails.forEach(num => { 
+     if (num) {
+      sum += num
+     }
+    })
+    await redisClient.set(`userUsage:${userId}`, sum)
+
+    console.log("redis update");
+
+    res.status(200).send({ status: 'file is deleted' });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).send({ status: error instanceof Error ? error.message : 'Unknown error' });
+  }
+} )
+
 async function getFileDetails(bucketName: string, key: string) {
   try {
     const params = { Bucket: bucketName, Key: key };
@@ -189,7 +226,7 @@ async function getFileDetails(bucketName: string, key: string) {
   }
 }
 
-app.get("/", async (req: Request, res) => {
+app.get("/", async (req: Request, res: Response) => {
   res.send("Server route");
 });
 

@@ -98,7 +98,7 @@ export async function deleteFile(userId: string | undefined, fileKey: string) {
     console.log(userId, fileKey);
     await ensureClerkLoaded();
     const token = await clerk.session?.getToken();
-    const deleteFile = await fetch(`${hostName}/api/${userId}/delete-object/${fileKey}/`,
+    const deleteFile = await fetch(`${hostName}/api/delete-object/${fileKey}`,
       { 
         method: "DELETE",
         mode: 'cors', 
@@ -113,18 +113,18 @@ export async function deleteFile(userId: string | undefined, fileKey: string) {
   }
 }
 
-export async function test(){
-  await ensureClerkLoaded();
-  const token = await clerk.session?.getToken();
+// export async function test(){
+//   await ensureClerkLoaded();
+//   const token = await clerk.session?.getToken();
 
-  const response = await fetch(`localhost:3000/api/protected`, 
-    { 
-      method: 'GET',
-      mode: 'cors', 
-      headers: {
-        Authorization: `Bearer ${token}`,
-      } 
-    }
-  );
-  console.log(response, 'authenticated'); 
-}
+//   const response = await fetch(`localhost:3000/api/protected`, 
+//     { 
+//       method: 'GET',
+//       mode: 'cors', 
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       } 
+//     }
+//   );
+//   console.log(response, 'authenticated'); 
+// }
