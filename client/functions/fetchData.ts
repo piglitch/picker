@@ -5,11 +5,14 @@ const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY!
 const hostName = import.meta.env.VITE_REACT_APP_API_URL!
 const clerk = new Clerk(clerkPubKey)
 
-useEffect(() => {
-  clerk.load().then(() => console.log("Clerk loaded"));
-}, []);
+async function ensureClerkLoaded() {
+  if (!clerk.session) {
+    await clerk.load();
+  }
+}
 
 export const fetchReq = async(userId: string | undefined) => {  
+  await ensureClerkLoaded();
   const token = await clerk.session?.getToken();
   const res = await fetch(`${hostName}/api/${userId}/verify-user`, 
     { 
@@ -26,6 +29,8 @@ export const fetchReq = async(userId: string | undefined) => {
 }
 
 export const uploadFile = async(userId: string | undefined, formData: BodyInit | null) => {  
+
+  await ensureClerkLoaded();
   const token = await clerk.session?.getToken();
   const response = await fetch(`${hostName}/api/${userId}/s3-upload/`, 
     { 
@@ -42,6 +47,7 @@ export const uploadFile = async(userId: string | undefined, formData: BodyInit |
 
 export async function fetchFilesS3(userId: string | undefined) {
   try {
+    await ensureClerkLoaded();
     const token = await clerk.session?.getToken();
     const response = await fetch(`${hostName}/api/${userId}/all-files/`,
       { 
@@ -66,6 +72,7 @@ export async function fetchFilesS3(userId: string | undefined) {
 
 export async function fetchFileSizesS3(userId: string | undefined) {
   try {
+    await ensureClerkLoaded();
     const token = await clerk.session?.getToken();
     const response = await fetch(`${hostName}/api/${userId}/file-details`, {
       method: 'GET',
@@ -89,6 +96,7 @@ export async function fetchFileSizesS3(userId: string | undefined) {
 export async function deleteFile(userId: string | undefined, fileKey: string) {
   try {
     console.log(userId, fileKey);
+    await ensureClerkLoaded();
     const token = await clerk.session?.getToken();
     const deleteFile = await fetch(`${hostName}/api/${userId}/delete-object/${fileKey}/`,
       { 
@@ -106,6 +114,7 @@ export async function deleteFile(userId: string | undefined, fileKey: string) {
 }
 
 export async function test(){
+  await ensureClerkLoaded();
   const token = await clerk.session?.getToken();
 
   const response = await fetch(`localhost:3000/api/protected`, 
