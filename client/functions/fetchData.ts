@@ -1,15 +1,12 @@
 import { Clerk } from '@clerk/clerk-js'
-import { useAuth } from '@clerk/clerk-react'
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY!
 const hostName = import.meta.env.VITE_REACT_APP_API_URL!
 const clerk = new Clerk(clerkPubKey)
-clerk.load()
+await clerk.load()
 
-const {getToken} = useAuth()
-const token = await getToken({ template: "default" });
 export const fetchReq = async(userId: string | undefined) => {  
-  // const token = await clerk.session?.getToken();
+  const token = await clerk.session?.getToken();
   const res = await fetch(`${hostName}/api/${userId}/verify-user`, 
     { 
       method: 'GET',
