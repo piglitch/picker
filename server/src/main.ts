@@ -46,7 +46,8 @@ const upload = multer({ storage: storage });
 
 
 
-app.get("/api/", async (req: Request, res) => {
+app.get("/api/", async (req: Request, res: Response) => {
+  console.log('Server is running');
   res.send("Server is up!");
 });
 
