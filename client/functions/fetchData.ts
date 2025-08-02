@@ -1,9 +1,13 @@
 import { Clerk } from '@clerk/clerk-js'
+import { useEffect } from 'react';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY!
 const hostName = import.meta.env.VITE_REACT_APP_API_URL!
 const clerk = new Clerk(clerkPubKey)
-await clerk.load()
+
+useEffect(() => {
+  clerk.load().then(() => console.log("Clerk loaded"));
+}, []);
 
 export const fetchReq = async(userId: string | undefined) => {  
   const token = await clerk.session?.getToken();
