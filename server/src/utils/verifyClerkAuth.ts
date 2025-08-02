@@ -8,6 +8,7 @@ export default function verifyClerkAuth(
 ): void {
   try {
     const { userId } = getAuth(req);
+    console.log(`User ID from Clerk: ${userId}`);
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized: Missing or invalid token" });
